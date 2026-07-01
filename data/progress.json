@@ -1,0 +1,39 @@
+{
+  "username": "John Doe",
+  "current_position": {
+    "module_id": "001",
+    "lesson_id": "000001"
+  },
+  "modules": {
+    "001": {
+      "000001": {
+        "theory": 0,
+        "practice": {
+          "codereview": 0,
+          "tests": 0
+        }
+      },
+      "000002": {
+        "theory": 0,
+        "practice": {
+          "codereview": 0,
+          "tests": 0
+        }
+      }
+    },
+    "002": {
+      "000003": {
+        "theory": 0,
+        "practice": {
+          "codereview": 0,
+          "tests": 0
+        }
+      }
+    }
+  },
+  "project": {
+    "project_id": "",
+    "progress": 0
+  },
+  "summary": ""
+}
