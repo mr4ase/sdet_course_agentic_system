@@ -7,29 +7,13 @@ from graph import graph
 from progress import load_progress, save_progress, init_progress
 from loguru_config import logger
 
-# my_message1: list[AnyMessage] = [
-#     HumanMessage(
-#         content=f"Hi! What is the biggest city by people in the world? Give me just a name, please",
-#         name="Max",
-#     )
-# ]
+test_msg_for_tutor = HumanMessage(
+    content="а если я назову функцию не test_addition, а просто addition_check — pytest её найдёт?"
+)
 
 config: RunnableConfig = {"configurable": {"thread_id": "1"}}
-messages = graph.invoke({"messages": []}, config=config)  # type: ignore[arg-type]
+messages = graph.invoke({"messages": [test_msg_for_tutor]}, config=config)  # type: ignore[arg-type]
 
-# # my_message2: list[AnyMessage] = [
-# #     HumanMessage(
-# #         content=f"In what country it is located?",
-# #         name="Max",
-# #     )
-# # ]
-# messages = graph.invoke({"messages": my_message2}, config=config)  # type: ignore[arg-type]
-# for m in messages["messages"]:
-#     m.pretty_print()
-
-# config1: RunnableConfig = {"configurable": {"thread_id": "2"}}
-
-# result_state = graph.invoke({"messages": my_message2}, config=config1)  # type: ignore[arg-type]
 for m in messages["messages"]:
     m.pretty_print()
 
