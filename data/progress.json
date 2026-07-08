@@ -8,7 +8,7 @@
     "001": {
       "000001": {
         "theory": 0,
-        "task_given": false,
+        "task_given": true,
         "practice": {
           "codereview": 0,
           "tests": 0

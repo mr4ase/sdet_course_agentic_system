@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 from state import State
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.messages import SystemMessage
+from langchain_core.messages import SystemMessage, HumanMessage
 from loguru_config import logger
 from src.utils import find_by_id
 from config import LLM_MODEL
@@ -40,9 +40,11 @@ def presenter(state: State) -> dict:
         """
     )
 
+    human_message_presenter = HumanMessage(content="Начни урок.")
+
     progress["modules"][module_id][lesson_id]["task_given"] = True
 
     return {
         "progress": progress,
-        "messages": [llm.invoke([system_message_presenter])],
+        "messages": [llm.invoke([system_message_presenter, human_message_presenter])],
     }
