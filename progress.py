@@ -28,6 +28,7 @@ def init_progress(curriculum_dict: dict, username: str) -> dict:
     module_progress = {}
     lesson_progress_init = {
         "theory": 0,
+        "task_given": False,
         "practice": {
             "codereview": 0,
             "tests": 0,

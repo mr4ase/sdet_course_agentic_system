@@ -8,6 +8,7 @@
     "001": {
       "000001": {
         "theory": 0,
+        "task_given": false,
         "practice": {
           "codereview": 0,
           "tests": 0
@@ -15,6 +16,7 @@
       },
       "000002": {
         "theory": 0,
+        "task_given": false,
         "practice": {
           "codereview": 0,
           "tests": 0
@@ -24,6 +26,7 @@
     "002": {
       "000003": {
         "theory": 0,
+        "task_given": false,
         "practice": {
           "codereview": 0,
           "tests": 0
