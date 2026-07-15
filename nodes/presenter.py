@@ -25,13 +25,19 @@ def presenter(state: State) -> dict:
     # current position
     module_id = progress["current_position"]["module_id"]
     lesson_id = progress["current_position"]["lesson_id"]
-    logger.info(f"Current position: module = {module_id}, lesson = {lesson_id}")
+    task_id = progress["current_position"]["task_id"]
+    logger.info(
+        f"Current position: module = {module_id}, lesson = {lesson_id}, task_id={task_id}",
+    )
 
     module_content = find_by_id(curriculum, module_id)
     lesson_content = find_by_id(module_content["lessons"], lesson_id)
+    task_content = find_by_id(lesson_content["tasks"], task_id)
+
+    # TODO: ступень 8 — не разворачивать key_points повторно, если в уроке уже есть task_given=true задание
 
     keypoints_str = "\n".join(f"- {kp}" for kp in lesson_content["key_points"])
-    task = lesson_content["task"]
+    task = task_content["task"]
 
     # LLM presenter_prompt
     system_message_presenter = SystemMessage(
@@ -42,7 +48,7 @@ def presenter(state: State) -> dict:
 
     human_message_presenter = HumanMessage(content="Начни урок.")
 
-    progress["modules"][module_id][lesson_id]["task_given"] = True
+    progress["modules"][module_id][lesson_id][task_id]["task_given"] = True
 
     return {
         "progress": progress,

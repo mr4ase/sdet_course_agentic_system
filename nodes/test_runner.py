@@ -41,12 +41,23 @@ def get_code_from_msg(msg: str) -> str | None:
 def test_runner(state: State) -> dict:
 
     user_msg = str(state["messages"][-1].content)
+    progress = state["progress"]
+    current_module = progress["current_position"]["module_id"]
+    current_lesson = progress["current_position"]["lesson_id"]
+    current_task = progress["current_position"]["task_id"]
+    attempts = progress["modules"][current_module][current_lesson][current_task][
+        "attempts"
+    ]
     user_code = get_code_from_msg(user_msg)
     stdout, stderr = "", ""
 
     if not user_code:
+        logger.info(
+            f"Test_runner: return_code = 8. There is no python code to execute in user_message: {user_msg}"
+        )
         return_code = 8
     else:
+        attempts += 1
         with tempfile.TemporaryDirectory(
             ignore_cleanup_errors=True, delete=True
         ) as temp_dir:
@@ -65,19 +76,31 @@ def test_runner(state: State) -> dict:
                 stdout = result.stdout
                 stderr = result.stderr
             except subprocess.TimeoutExpired as e:
-                logger.warning(f"User's test task code exited with TimeoutExpired: {e}")
+                logger.warning(
+                    f"Test_runner. Return_code = 7. User's test task code exited with TimeoutExpired: {e}"
+                )
                 return_code = 7
                 stdout = e.stdout
                 stderr = e.stderr
 
-    task_test: dict = {
+    task_result: dict = {
         "return_code": return_code,
-        "return_stdout": stdout,
-        "return_stderr": stderr,
+        "stdout": stdout,
+        "stderr": stderr,
     }
-    logger.info(f"test_runner finished with the task_test dict: {task_test}")
 
-    return {"task_test": task_test}
+    if task_result["return_code"] in [3, 4, 6]:
+        logger.error(
+            f"SYSTEM ERROR: Test_runner finished with the task_result dict: {task_result}"
+        )
+    else:
+        logger.info(f"Test_runner finished with the task_result dict: {task_result}")
+
+    progress["modules"][current_module][current_lesson][current_task][
+        "attempts"
+    ] = attempts
+
+    return {"progress": progress, "task_test": task_result}
 
 
 # result = run_students_tests()

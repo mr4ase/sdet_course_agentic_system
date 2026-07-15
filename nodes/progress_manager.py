@@ -20,4 +20,4 @@ def progress_manager(state: State) -> dict:
     return {
         "curriculum": curriculum,
         "progress": load_progress(),
-    }  # TODO: progress_manager перечитывает progress с диска на каждом проходе - при мутации прогресса в state (ступень 4+) переделать.
+    }  # TODO: progress_manager перечитывает progress с диска на каждом новом проходе графа. Неэффективно. Переделать позже, когда мутации данных во время работы графа станут многочисленны и существенны (после ступени 9, например).
