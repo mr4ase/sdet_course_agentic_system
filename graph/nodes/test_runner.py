@@ -9,7 +9,7 @@ import tempfile
 from pathlib import Path
 
 from loguru_config import logger
-from state import State
+from graph.state import State
 from config import RUN_TEST_TIMEOUT
 
 RETURN_CODES = {

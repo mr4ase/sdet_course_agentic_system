@@ -3,8 +3,8 @@
 from langchain_core.messages import AnyMessage, HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
 
-from graph import graph
-from progress import load_progress, save_progress, init_progress
+from graph.graph import graph
+from src.progress import load_progress, save_progress, init_progress
 from loguru_config import logger
 
 test_msg_for_tutor = HumanMessage(

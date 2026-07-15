@@ -2,10 +2,10 @@
 
 from pathlib import Path
 
-from state import State
+from graph.state import State
 from config import PROGRESS_FILE_PATH, THE_USER
-from curriculum import load_curriculum
-from progress import load_progress, save_progress, init_progress
+from src.curriculum import load_curriculum
+from src.progress import load_progress, save_progress, init_progress
 
 progress_file_path = Path(PROGRESS_FILE_PATH)
 curriculum = load_curriculum()

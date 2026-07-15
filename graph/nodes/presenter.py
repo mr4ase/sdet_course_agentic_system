@@ -4,7 +4,7 @@ import os
 
 from dotenv import load_dotenv
 
-from state import State
+from graph.state import State
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import SystemMessage, HumanMessage
 from loguru_config import logger

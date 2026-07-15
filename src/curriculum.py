@@ -19,5 +19,7 @@ def load_curriculum(filename: str = "data/curriculum.json") -> dict:
     except FileNotFoundError as e:
         logger.critical(f"File {curriculum_file.name} not found. {e}")
         raise
-    logger.info(f"Course curriculum loaded from the file {curriculum_file.name}")
+    logger.info(
+        f"Course curriculum successfully loaded from file {curriculum_file.name}"
+    )
     return curriculum_dict

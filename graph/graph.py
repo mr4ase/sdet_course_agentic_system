@@ -6,14 +6,14 @@ from langgraph.graph import StateGraph, START, END
 # from langgraph.prebuilt import ToolNode
 # from langgraph.prebuilt import tools_condition
 
-from state import State
+from graph.state import State
 
-from nodes.tutor import tutor_llm
-from nodes.progress_manager import progress_manager
-from edges.session_router import session_router
+from graph.nodes.tutor import tutor_llm
+from graph.nodes.progress_manager import progress_manager
+from graph.edges.session_router import session_router
 
-from nodes.test_runner import test_runner
-from nodes.presenter import presenter
+from graph.nodes.test_runner import test_runner
+from graph.nodes.presenter import presenter
 
 checkpointer = MemorySaver()
 

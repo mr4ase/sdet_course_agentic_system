@@ -2,7 +2,7 @@
 
 from typing import Literal
 
-from state import State
+from graph.state import State
 from loguru_config import logger
 
 
