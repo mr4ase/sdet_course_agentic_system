@@ -1,9 +1,11 @@
 # state.py
 
 from langgraph.graph import MessagesState
+from schema.reviewer_result import ReviewerResult
 
 
 class State(MessagesState):
     curriculum: list
     progress: dict
-    task_test: dict
+    task_result: dict
+    review: ReviewerResult

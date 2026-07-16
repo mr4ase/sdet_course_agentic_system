@@ -23,7 +23,7 @@ def load_progress(filename: str = "data/progress.json") -> dict:
     return progress_dict
 
 
-def init_progress(curriculum_dict: dict, username: str) -> dict:
+def init_progress(curriculum_dict: list, username: str) -> dict:
 
     module_progress = {}
     lesson_progress = {}

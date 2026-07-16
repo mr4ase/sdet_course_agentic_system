@@ -11,18 +11,8 @@ from pathlib import Path
 from loguru_config import logger
 from graph.state import State
 from config import RUN_TEST_TIMEOUT
+from config import RETURN_CODES
 
-RETURN_CODES = {
-    0: "passed",
-    1: "test_failed",
-    2: "test_interrupted",
-    3: "pytest_internal_error",
-    4: "pytest_usage_error",
-    5: "no_tests_found",
-    6: "max_warnings_exceeded",
-    7: "timeout_expired",
-    8: "no_code_in_message",
-}
 
 
 def get_code_from_msg(msg: str) -> str | None:
@@ -48,23 +38,25 @@ def test_runner(state: State) -> dict:
     attempts = progress["modules"][current_module][current_lesson][current_task][
         "attempts"
     ]
-    user_code = get_code_from_msg(user_msg)
+    code = get_code_from_msg(user_msg)
     stdout, stderr = "", ""
+    user_code = ""
 
-    if not user_code:
+    if not code:
         logger.info(
             f"Test_runner: return_code = 8. There is no python code to execute in user_message: {user_msg}"
         )
         return_code = 8
     else:
         attempts += 1
+        user_code = code
         with tempfile.TemporaryDirectory(
             ignore_cleanup_errors=True, delete=True
         ) as temp_dir:
             test_file_path = Path(temp_dir) / "test_user_task_code.py"
 
             with test_file_path.open(mode="w", encoding="utf-8") as f:
-                f.write(user_code)
+                f.write(code)
             try:
                 result = subprocess.run(
                     [sys.executable, "-m", "pytest", test_file_path],
@@ -87,6 +79,7 @@ def test_runner(state: State) -> dict:
         "return_code": return_code,
         "stdout": stdout,
         "stderr": stderr,
+        "user_code": user_code,
     }
 
     if task_result["return_code"] in [3, 4, 6]:
@@ -100,7 +93,7 @@ def test_runner(state: State) -> dict:
         "attempts"
     ] = attempts
 
-    return {"progress": progress, "task_test": task_result}
+    return {"progress": progress, "task_result": task_result}
 
 
 # result = run_students_tests()
