@@ -23,23 +23,23 @@ def load_progress(filename: str = "data/progress.json") -> dict:
     return progress_dict
 
 
-def init_progress(curriculum_dict: dict, username: str) -> dict:
+def init_progress(curriculum_dict: list, username: str) -> dict:
 
     module_progress = {}
-    lesson_progress_init = {
-        "theory": 0,
-        "task_given": False,
-        "practice": {
-            "codereview": 0,
-            "tests": 0,
-        },
+    lesson_progress = {}
+    task_progress_init = {
+        "task_given": False, 
+        "attempts": 0,
+        "scores": []
     }
 
     for module in curriculum_dict:
         lesson_progress = {}
-
         for lesson in module["lessons"]:
-            lesson_progress[lesson["id"]] = deepcopy(lesson_progress_init)
+            task_progress = {}
+            for task in lesson["tasks"]:
+                task_progress[task["id"]] = deepcopy(task_progress_init)
+            lesson_progress[lesson["id"]] = task_progress
         module_progress[module["id"]] = lesson_progress
 
     progress_init_dict = {
@@ -47,6 +47,7 @@ def init_progress(curriculum_dict: dict, username: str) -> dict:
         "current_position": {
             "module_id": curriculum_dict[0]["id"],
             "lesson_id": curriculum_dict[0]["lessons"][0]["id"],
+            "task_id": curriculum_dict[0]["lessons"][0]["tasks"][0]["id"]
         },
         "modules": module_progress,
         "project": {

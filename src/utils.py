@@ -1,6 +1,7 @@
 # src\utils.py
 
 from loguru_config import logger
+from schema.reviewer_result import Verdict
 
 
 def find_by_id(items: list, target_id: str) -> dict:
@@ -9,8 +10,18 @@ def find_by_id(items: list, target_id: str) -> dict:
 
     for item in items:
         if item[key] == target_id:
-            logger.info(f"Find_by_id: {key} {target_id} found")
+            # logger.info(f"Find_by_id: {key} {target_id} found")
             return item
     error_msg = f"Find_by_id: {key} {target_id} wasn't found"
     logger.critical(error_msg)
     raise KeyError(error_msg)
+
+
+def get_score(verdicts: list[Verdict]) -> int | None:
+    if not verdicts:
+        logger.warning("Can't calculate the score. 'Data' list is empty")
+        return None
+
+    score = int(sum(elem.passed for elem in verdicts) / len(verdicts) * 10 + 0.5)
+
+    return score
