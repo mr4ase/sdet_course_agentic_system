@@ -10,7 +10,7 @@
       "000001": {
         "task-000001": {
           "task_given": true,
-          "attempts": 10,
+          "attempts": 11,
           "scores": [
             {
               "criteria": 10,

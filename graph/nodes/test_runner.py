@@ -58,9 +58,16 @@ def test_runner(state: State) -> dict:
                 f.write(code)
             try:
                 result = subprocess.run(
-                    [sys.executable, "-m", "pytest", str(test_file_path),
-                    "--rootdir", temp_dir,
-                    "-p", "no:cacheprovider"],
+                    [
+                        sys.executable,
+                        "-m",
+                        "pytest",
+                        str(test_file_path),
+                        "--rootdir",
+                        temp_dir,
+                        "-p",
+                        "no:cacheprovider",
+                    ],
                     capture_output=True,
                     text=True,
                     timeout=RUN_TEST_TIMEOUT,
