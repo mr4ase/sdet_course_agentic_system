@@ -1,0 +1,40 @@
+{
+  "username": "John Doe",
+  "current_position": {
+    "module_id": "001",
+    "lesson_id": "000001",
+    "task_id": "task-000001"
+  },
+  "modules": {
+    "001": {
+      "000001": {
+        "task-000001": {
+          "task_given": true,
+          "attempts": 8,
+          "scores": []
+        }
+      },
+      "000002": {
+        "task-000002": {
+          "task_given": false,
+          "attempts": 0,
+          "scores": []
+        }
+      }
+    },
+    "002": {
+      "000003": {
+        "task-000003": {
+          "task_given": false,
+          "attempts": 0,
+          "scores": []
+        }
+      }
+    }
+  },
+  "project": {
+    "project_id": "",
+    "progress": 0
+  },
+  "summary": ""
+}

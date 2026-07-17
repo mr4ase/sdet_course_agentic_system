@@ -14,7 +14,6 @@ from config import RUN_TEST_TIMEOUT
 from config import RETURN_CODES
 
 
-
 def get_code_from_msg(msg: str) -> str | None:
 
     search_str = re.compile(r"```python(.*?)```", re.DOTALL)
@@ -59,10 +58,13 @@ def test_runner(state: State) -> dict:
                 f.write(code)
             try:
                 result = subprocess.run(
-                    [sys.executable, "-m", "pytest", test_file_path],
+                    [sys.executable, "-m", "pytest", str(test_file_path),
+                    "--rootdir", temp_dir,
+                    "-p", "no:cacheprovider"],
                     capture_output=True,
                     text=True,
                     timeout=RUN_TEST_TIMEOUT,
+                    cwd=temp_dir,
                 )
                 return_code = result.returncode
                 stdout = result.stdout

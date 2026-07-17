@@ -1,6 +1,6 @@
 from langchain_core.messages import SystemMessage
 
-system_message_reviewer = SystemMessage(
+reviewer_role_system_message = SystemMessage(
     content="""Ты — ревьюер кода в системе обучения тестированию на Python. Ты оцениваешь качество кода ученика.
 
 Тебе дают: код ученика, список критериев задания, список паттернов качества, результат прогона тестов.

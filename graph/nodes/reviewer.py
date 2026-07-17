@@ -10,7 +10,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import SystemMessage, HumanMessage
 from config import LLM_MODEL
 from src.utils import find_by_id
-from system_prompts.reviewer_prompt import system_message_reviewer
+from system_prompts.reviewer_prompt import reviewer_role_system_message
 from config import RETURN_CODES
 from schema.reviewer_result import Verdict, ReviewerResult
 
@@ -48,6 +48,7 @@ def reviewer(state: State) -> dict:
     curriculum = state["curriculum"]
     progress = state["progress"]
     task_result = state["task_result"]
+    assert task_result is not None, "test_result_router вызван без task_result"
 
     current_module = progress["current_position"]["module_id"]
     current_lesson = progress["current_position"]["lesson_id"]
@@ -79,7 +80,7 @@ def reviewer(state: State) -> dict:
 {patterns_str}
 
 Результат прогона теста (код ученика выше запущен через pytest):
-- Код возврата: {task_result['return_code']} ({RETURN_CODES[task_result['return_code']]})
+- Код возврата: {return_code} ({RETURN_CODES[task_result['return_code']]})
 - Стандартный вывод: {task_result['stdout']}
 - Вывод ошибок: {task_result['stderr']}
 """)
@@ -88,4 +89,4 @@ def reviewer(state: State) -> dict:
         ReviewerResult
     )  # include_raw = True flag adds the raw ai message
 
-    return {"review": structured_llm.invoke([system_message_reviewer, human_message])}
+    return {"review": structured_llm.invoke([reviewer_role_system_message, human_message])}

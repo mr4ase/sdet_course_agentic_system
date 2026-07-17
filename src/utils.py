@@ -9,7 +9,7 @@ def find_by_id(items: list, target_id: str) -> dict:
 
     for item in items:
         if item[key] == target_id:
-            logger.info(f"Find_by_id: {key} {target_id} found")
+            # logger.info(f"Find_by_id: {key} {target_id} found")
             return item
     error_msg = f"Find_by_id: {key} {target_id} wasn't found"
     logger.critical(error_msg)
