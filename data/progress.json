@@ -10,8 +10,17 @@
       "000001": {
         "task-000001": {
           "task_given": true,
-          "attempts": 8,
-          "scores": []
+          "attempts": 10,
+          "scores": [
+            {
+              "criteria": 10,
+              "patterns": 10
+            },
+            {
+              "criteria": 10,
+              "patterns": 8
+            }
+          ]
         }
       },
       "000002": {

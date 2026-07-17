@@ -8,11 +8,14 @@ from pathlib import Path
 from graph.state import State
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import SystemMessage, HumanMessage
+from typing import cast
+
 from config import LLM_MODEL
-from src.utils import find_by_id
+from src.utils import find_by_id, get_score
 from system_prompts.reviewer_prompt import reviewer_role_system_message
 from config import RETURN_CODES
 from schema.reviewer_result import Verdict, ReviewerResult
+
 
 from loguru import logger
 
@@ -89,4 +92,18 @@ def reviewer(state: State) -> dict:
         ReviewerResult
     )  # include_raw = True flag adds the raw ai message
 
-    return {"review": structured_llm.invoke([reviewer_role_system_message, human_message])}
+    reviewer_llm_result = cast(
+        ReviewerResult,
+        structured_llm.invoke([reviewer_role_system_message, human_message]),
+    )  # type ReviewerResult schema
+
+    criteria_score = get_score(reviewer_llm_result.criteria)
+    patterns_score = get_score(reviewer_llm_result.patterns)
+
+    scores_dict = {"criteria": criteria_score, "patterns": patterns_score}
+
+    progress["modules"][current_module][current_lesson][current_task]["scores"].append(
+        scores_dict
+    )
+
+    return {"review": reviewer_llm_result, "progress": progress}
