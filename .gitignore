@@ -2,3 +2,6 @@
 .env
 __pycache__/
 *.pyc
+student_workflow/
+data/project_state.json
+data/progress.json

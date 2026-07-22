@@ -11,7 +11,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from typing import cast
 
 from config import LLM_MODEL
-from src.utils import find_by_id, get_score
+from src.utils import find_by_id, get_score, find_lesson, find_task
 from system_prompts.reviewer_prompt import reviewer_role_system_message
 from config import RETURN_CODES
 from schema.reviewer_result import Verdict, ReviewerResult
@@ -51,22 +51,15 @@ def reviewer(state: State) -> dict:
     curriculum = state["curriculum"]
     progress = state["progress"]
     task_result = state["task_result"]
+    position = progress["current_position"]
     assert task_result is not None, "test_result_router вызван без task_result"
 
-    current_module = progress["current_position"]["module_id"]
-    current_lesson = progress["current_position"]["lesson_id"]
-    current_task = progress["current_position"]["task_id"]
-
-    module_content = find_by_id(curriculum, current_module)
-    lesson_content = find_by_id(module_content["lessons"], current_lesson)
-    task_content = find_by_id(lesson_content["tasks"], current_task)
-
-    # TODO make a helper find_task(curriculum, progress) in utils/ to get current task info
+    task = find_task(curriculum, progress)
 
     user_code = task_result["user_code"]
     return_code = task_result["return_code"]
 
-    task_criteria = task_content["criteria"]
+    task_criteria = task["criteria"]
     task_criteria_str = "\n".join(f"- {criteria}" for criteria in task_criteria)
     patterns_str = "\n".join(
         f"- {pattern['name']}\n(Пояснение: {pattern['description']})"
@@ -102,8 +95,8 @@ def reviewer(state: State) -> dict:
 
     scores_dict = {"criteria": criteria_score, "patterns": patterns_score}
 
-    progress["modules"][current_module][current_lesson][current_task]["scores"].append(
-        scores_dict
-    )
+    progress["modules"][position["module_id"]][position["lesson_id"]][
+        position["task_id"]
+    ]["scores"].append(scores_dict)
 
     return {"review": reviewer_llm_result, "progress": progress}

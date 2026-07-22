@@ -16,7 +16,16 @@
           {
             "id": "task-000001",
             "task":"Написать функцию test_addition, которая проверяет через assert, что 2 + 2 == 4",
-            "criteria": ["тест начинается с test_", "есть хотя бы один assert"]
+            "criteria": ["тест начинается с test_", "есть хотя бы один assert"],
+            "run_mode": "project",
+            "submission": "test"
+          },
+          {
+            "id": "task-000006",
+            "task":"Написать функцию test_addition, которая проверяет через assert, что 3 + 3 == 6",
+            "criteria": ["тест начинается с test_", "есть хотя бы один assert"],
+            "run_mode": "project",
+            "submission": "test"
           }
         ]
       },
@@ -33,7 +42,9 @@
           {
             "id": "task-000002",
             "task":"Написать фикстуру sample_data, возвращающую словарь {\"x\": 10}, и тест, который её принимает и проверяет значение x",
-            "criteria": ["используется декоратор @pytest.fixture", "фикстура передана в тест как аргумент"]
+            "criteria": ["используется декоратор @pytest.fixture", "фикстура передана в тест как аргумент"],
+            "run_mode": "project",
+            "submission": "test"
           }
         ]
       }
@@ -56,7 +67,9 @@
           {
             "id": "task-000003",
             "task":"Написать тест, который делает GET-запрос к https://httpbin.org/status/200 и проверяет, что status_code == 200",
-            "criteria": ["используется requests.get", "проверяется response.status_code"]
+            "criteria": ["используется requests.get", "проверяется response.status_code"],
+            "run_mode": "project",
+            "submission": "test"
           }
         ]
       }

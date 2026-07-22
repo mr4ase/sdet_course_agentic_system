@@ -8,7 +8,7 @@ from src.progress import load_progress, save_progress, init_progress
 from loguru_config import logger
 
 test_msg_for_tutor = HumanMessage(
-    content="а если я назову функцию не test_addition, а просто addition_check — pytest её найдёт?\n```python\ndef test_addition():\n    assert 2 + 2 == 5\n```"
+    content="а если вот так?\n```python\ndef test_addition():\n    assert 3 + 3 == 6\n```"
 )
 
 config: RunnableConfig = {"configurable": {"thread_id": "1"}}

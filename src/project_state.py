@@ -5,8 +5,10 @@ from loguru_config import logger
 from pathlib import Path
 from copy import deepcopy
 
+from config import PROJECT_STATE_FILE_PATH
 
-def load_project_state(filename: str = "data/project_state.json") -> dict:
+
+def load_project_state(filename: str = PROJECT_STATE_FILE_PATH) -> dict:
 
     project_state_file = Path(filename)
     try:
@@ -23,7 +25,7 @@ def load_project_state(filename: str = "data/project_state.json") -> dict:
     return project_state_dict
 
 
-def init_project_state(project_dict: dict, username: str) -> dict:
+def init_project_state(project_dict: dict) -> dict:
 
     projest_state_init_dict = {
         "current_milestone": project_dict["milestones"][0]["id"],
@@ -34,10 +36,10 @@ def init_project_state(project_dict: dict, username: str) -> dict:
     return projest_state_init_dict
 
 
-def save_project_state(data: dict, filename: str = "data/project_state.json") -> None:
+def save_project_state(data: dict, filename: str = PROJECT_STATE_FILE_PATH) -> None:
 
     project_state_file = Path(filename)
     project_state_file.parent.mkdir(parents=True, exist_ok=True)
     with project_state_file.open("w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
-    logger.debug(f"Course project state saved to the file {project_state_file.name}")
+    logger.info(f"Course project state saved to the file {project_state_file.name}")

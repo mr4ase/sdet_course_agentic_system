@@ -9,3 +9,5 @@ class State(MessagesState):
     progress: dict
     task_result: dict | None
     review: ReviewerResult | None
+    project_state: dict
+    project_plan: dict

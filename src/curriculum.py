@@ -4,9 +4,10 @@ import json
 from pathlib import Path
 
 from loguru_config import logger
+from config import CURRICULUM_FILE_PATH
 
 
-def load_curriculum(filename: str = "data/curriculum.json") -> list:
+def load_curriculum(filename: str = CURRICULUM_FILE_PATH) -> list:
 
     curriculum_file = Path(filename)
     try:

@@ -5,8 +5,10 @@ from loguru_config import logger
 from pathlib import Path
 from copy import deepcopy
 
+from config import PROGRESS_FILE_PATH
 
-def load_progress(filename: str = "data/progress.json") -> dict:
+
+def load_progress(filename: str = PROGRESS_FILE_PATH) -> dict:
 
     progress_file = Path(filename)
     try:
@@ -27,11 +29,7 @@ def init_progress(curriculum_dict: list, username: str) -> dict:
 
     module_progress = {}
     lesson_progress = {}
-    task_progress_init = {
-        "task_given": False, 
-        "attempts": 0,
-        "scores": []
-    }
+    task_progress_init = {"task_given": False, "attempts": 0, "scores": []}
 
     for module in curriculum_dict:
         lesson_progress = {}
@@ -47,7 +45,7 @@ def init_progress(curriculum_dict: list, username: str) -> dict:
         "current_position": {
             "module_id": curriculum_dict[0]["id"],
             "lesson_id": curriculum_dict[0]["lessons"][0]["id"],
-            "task_id": curriculum_dict[0]["lessons"][0]["tasks"][0]["id"]
+            "task_id": curriculum_dict[0]["lessons"][0]["tasks"][0]["id"],
         },
         "modules": module_progress,
         "project": {
@@ -61,7 +59,7 @@ def init_progress(curriculum_dict: list, username: str) -> dict:
     return progress_init_dict
 
 
-def save_progress(data: dict, filename: str = "data/progress.json") -> None:
+def save_progress(data: dict, filename: str = PROGRESS_FILE_PATH) -> None:
 
     progress_file = Path(filename)
     progress_file.parent.mkdir(parents=True, exist_ok=True)

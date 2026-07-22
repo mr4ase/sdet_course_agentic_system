@@ -24,12 +24,26 @@ def tutor_llm(state: State) -> dict:
     context_parts = []
 
     if task_result:
+        project_dir_run = task_result["project_dir_run"]
         context_parts.append(
             f"Результат выполнения теста:\n"
             f" - Код возврата pytest: {task_result['return_code']}, {RETURN_CODES[task_result['return_code']]}\n"
             f" - Вывод: {task_result['stdout']}.\n"
             f" - Ошибки: {task_result['stderr']}"
         )
+
+        if (
+            task_result["return_code"] == 0
+            and project_dir_run
+            and project_dir_run["return_code"] != 0
+        ):
+            context_parts.append(
+                f"Обнаружена регрессия: присланный код прошёл, но один из ранее написанных "
+                f"тестов проекта перестал проходить. Результат прогона всего проекта:\n"
+                f" - Код возврата pytest: {project_dir_run['return_code']}, {RETURN_CODES[project_dir_run['return_code']]}\n"
+                f" - Вывод: {project_dir_run['stdout']}.\n"
+                f" - Ошибки: {project_dir_run['stderr']}"
+            )
 
     if review:
         criteria_review_str = "\n".join(

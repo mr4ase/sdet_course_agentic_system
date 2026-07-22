@@ -1,0 +1,16 @@
+{
+  "milestones": [
+    {
+      "id": "m-001",
+      "goal": "Базовые тесты с assert и фикстурами",
+      "task_ids": ["task-000001", "task-000002"],
+      "done_check": "def test_milestone_001():\n    assert True"
+    },
+    {
+      "id": "m-002",
+      "goal": "Проверка статус-кода API через requests",
+      "task_ids": ["task-000003"],
+      "done_check": "def test_milestone_002():\n    assert True"
+    }
+  ]
+}
