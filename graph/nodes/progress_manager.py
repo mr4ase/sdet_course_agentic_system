@@ -35,6 +35,7 @@ def progress_manager(state: State) -> dict:
         "progress": load_progress(),
         "task_result": None,
         "review": None,
+        "milestone_result": None,
         "project_state": load_project_state(),
         "project_plan": project_plan,
     }  # TODO: progress_manager перечитывает progress с диска на каждом новом проходе графа. Неэффективно. Переделать позже, когда мутации данных во время работы графа станут многочисленны и существенны (после ступени 9, например). Нужен будет один источник ответственности для данных progress в state - или MemorySaver или файл progress. Лучше - MemorySaver.

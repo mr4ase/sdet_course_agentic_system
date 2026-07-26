@@ -8,7 +8,7 @@ from graph.state import State
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import SystemMessage, HumanMessage
 from loguru_config import logger
-from src.utils import find_by_id, find_lesson, find_task
+from src.utils import find_by_id, find_lesson, find_current_task_info
 from config import LLM_MODEL
 
 load_dotenv()
@@ -32,7 +32,7 @@ def presenter(state: State) -> dict:
     )
 
     lesson = find_lesson(curriculum, progress)
-    task = find_task(curriculum, progress)
+    task = find_current_task_info(curriculum, progress)
 
     # TODO: ступень 8 - не разворачивать key_points повторно, если в уроке уже есть task_given=true задание
 

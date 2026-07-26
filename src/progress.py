@@ -29,7 +29,12 @@ def init_progress(curriculum_dict: list, username: str) -> dict:
 
     module_progress = {}
     lesson_progress = {}
-    task_progress_init = {"task_given": False, "attempts": 0, "scores": []}
+    task_progress_init = {
+        "task_given": False,
+        "attempts": 0,
+        "scores": [],
+        "passed": False,
+    }
 
     for module in curriculum_dict:
         lesson_progress = {}

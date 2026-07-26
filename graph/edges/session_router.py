@@ -4,7 +4,7 @@ from typing import Literal
 
 from graph.state import State
 from loguru_config import logger
-from src.utils import find_task
+from src.utils import find_current_task_info
 
 
 def session_router(state: State) -> Literal["lead", "react", "test"]:
@@ -15,7 +15,7 @@ def session_router(state: State) -> Literal["lead", "react", "test"]:
     lesson_id = progress["current_position"]["lesson_id"]
     task_id = progress["current_position"]["task_id"]
 
-    task = find_task(curriculum, progress)
+    task = find_current_task_info(curriculum, progress)
 
     task_given = progress["modules"][module_id][lesson_id][task_id]["task_given"]
 

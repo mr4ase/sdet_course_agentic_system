@@ -14,9 +14,11 @@ from graph.nodes.reviewer import reviewer
 from graph.nodes.system_error import system_error_handler
 from graph.edges.session_router import session_router
 from graph.edges.test_result_router import test_result_router
+from graph.edges.milestone_router import milestone_router
 
 from graph.nodes.test_runner import test_runner
 from graph.nodes.presenter import presenter
+from graph.nodes.milestone_checker import milestone_checker
 
 checkpointer = MemorySaver()
 
@@ -28,10 +30,12 @@ builder.add_node("test_runner", test_runner)
 builder.add_node("tutor_llm", tutor_llm)
 builder.add_node("reviewer", reviewer)
 builder.add_node("system_error_handler", system_error_handler)
+builder.add_node("milestone_checker", milestone_checker)
 
 # EDGES
 builder.add_edge(START, "progress_manager")
-builder.add_edge("reviewer", "tutor_llm")
+# builder.add_edge("reviewer", "milestone_checker")
+builder.add_edge("milestone_checker", "tutor_llm")
 builder.add_edge("presenter", END)
 builder.add_edge("tutor_llm", END)
 builder.add_edge("system_error_handler", END)
@@ -53,5 +57,10 @@ builder.add_conditional_edges(
     },
 )
 
+builder.add_conditional_edges(
+    "reviewer",
+    milestone_router,
+    {"check_milestone": "milestone_checker", "answer": "tutor_llm"},
+)
 
 graph = builder.compile(checkpointer=checkpointer)

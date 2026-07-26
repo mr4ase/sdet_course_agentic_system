@@ -20,6 +20,7 @@ def tutor_llm(state: State) -> dict:
 
     task_result = state.get("task_result")
     review = state.get("review")
+    milestone_result = state.get("milestone_result")
 
     context_parts = []
 
@@ -60,6 +61,13 @@ def tutor_llm(state: State) -> dict:
             f"Общие паттерны качества кода:\n{patterns_review_str}\n"
             f"Главная проблема кода студента:\n{review.main_problem}\n"
             f"Сильные стороны кода студента:\n{review.strengths}"
+        )
+
+    if milestone_result and milestone_result["return_code"] == 0:
+        context_parts.append(
+            f"Студент закрыл веху проекта: {milestone_result['goal']}. "
+            f"Это крупный рубеж — несколько связанных задач собрались в работающую часть проекта. "
+            f"Поздравь студента и отметь, какой этап проекта теперь готов."
         )
 
     context_str = "\n\n".join(context_parts)

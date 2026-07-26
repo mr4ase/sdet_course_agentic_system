@@ -11,7 +11,8 @@ from pathlib import Path
 from loguru_config import logger
 from graph.state import State
 from config import RUN_TEST_TIMEOUT, USER_DIR, RETURN_CODES
-from src.utils import find_task
+from src.utils import find_current_task_info
+from src.pytest_runner import write_code_to_file, run_pytest
 
 
 def get_code_from_msg(msg: str) -> str | None:
@@ -27,46 +28,6 @@ def get_code_from_msg(msg: str) -> str | None:
     return python_code
 
 
-def write_to_file(dir_to: Path, filename: str, code: str) -> Path:
-    full_filepath = dir_to / filename
-
-    with full_filepath.open(mode="w", encoding="utf-8") as f:
-        f.write(code)
-    return full_filepath
-
-
-def run_pytest(work_dir: Path, what_to_run: Path) -> dict:
-    try:
-        result = subprocess.run(
-            [
-                sys.executable,
-                "-m",
-                "pytest",
-                str(what_to_run),
-                "--rootdir",
-                str(work_dir),
-                "-p",
-                "no:cacheprovider",
-            ],
-            capture_output=True,
-            text=True,
-            timeout=RUN_TEST_TIMEOUT,
-            cwd=work_dir,
-        )
-        return_code = result.returncode
-        stdout = result.stdout
-        stderr = result.stderr
-    except subprocess.TimeoutExpired as e:
-        logger.warning(
-            f"Test_runner. Return_code = 7. User's test task code exited with TimeoutExpired: {e}"
-        )
-        return_code = 7
-        stdout = e.stdout
-        stderr = e.stderr
-
-    return {"return_code": return_code, "stdout": stdout, "stderr": stderr}
-
-
 def test_runner(state: State) -> dict:
 
     user_msg = str(state["messages"][-1].content)
@@ -77,7 +38,7 @@ def test_runner(state: State) -> dict:
     current_task = progress["current_position"]["task_id"]
     project_dir_run_result = None
 
-    task = find_task(curriculum, progress)
+    task = find_current_task_info(curriculum, progress)
 
     attempts = progress["modules"][current_module][current_lesson][current_task][
         "attempts"
@@ -100,13 +61,13 @@ def test_runner(state: State) -> dict:
                 ignore_cleanup_errors=True, delete=True
             ) as temp_dir:
                 temp_dir_path = Path(temp_dir)
-                write_to_file(temp_dir_path, "test_user_task_code.py", user_code)
+                write_code_to_file(temp_dir_path, "test_user_task_code.py", user_code)
                 run_result = run_pytest(temp_dir_path, temp_dir_path)
 
         elif task["run_mode"] == "project":
             py_filename = f"test_{task['id']}.py".replace("-", "_")
             user_dir = Path(USER_DIR).resolve()
-            file_path = write_to_file(user_dir, py_filename, user_code)
+            file_path = write_code_to_file(user_dir, py_filename, user_code)
             run_result = run_pytest(user_dir, file_path)
             project_dir_run_result = run_pytest(user_dir, user_dir)
 

@@ -35,7 +35,24 @@ def find_lesson(curriculum: list, progress: dict) -> dict:
     return find_by_id(module_elem["lessons"], current_lesson)
 
 
-def find_task(curriculum: list, progress: dict) -> dict:
+def find_current_task_info(curriculum: list, progress: dict) -> dict:
     lesson = find_lesson(curriculum, progress)
     current_task = progress["current_position"]["task_id"]
     return find_by_id(lesson["tasks"], current_task)
+
+
+def task_status(task_id: str, progress: dict) -> bool:
+
+    for module_id, lessons in progress["modules"].items():
+        for lesson_id, tasks in lessons.items():
+            if task_id in tasks:
+                return tasks[task_id]["passed"]
+
+    logger.error(f"Task_id {task_id} not found in progress")
+    raise KeyError(f"Task_id {task_id} not found in progress")
+
+
+def milestone_status(milestone_id: str, progress: dict, project_plan: dict) -> bool:
+
+    milestone = find_by_id(project_plan["milestones"], milestone_id)
+    return all(task_status(task_id, progress) for task_id in milestone["task_ids"])

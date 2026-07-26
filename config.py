@@ -8,6 +8,7 @@ CURRICULUM_FILE_PATH = "data/curriculum.json"
 USER_DIR = "student_workflow/"
 THE_USER = "John Doe"
 RUN_TEST_TIMEOUT = 5  # parameter for subprocess.run in seconds
+CRITERIA_PASSED_SCORE = 10
 
 RETURN_CODES = {
     0: "passed",

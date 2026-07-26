@@ -11,7 +11,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from typing import cast
 
 from config import LLM_MODEL
-from src.utils import find_by_id, get_score, find_lesson, find_task
+from src.utils import find_by_id, get_score, find_lesson, find_current_task_info
 from system_prompts.reviewer_prompt import reviewer_role_system_message
 from config import RETURN_CODES
 from schema.reviewer_result import Verdict, ReviewerResult
@@ -54,7 +54,7 @@ def reviewer(state: State) -> dict:
     position = progress["current_position"]
     assert task_result is not None, "test_result_router вызван без task_result"
 
-    task = find_task(curriculum, progress)
+    task = find_current_task_info(curriculum, progress)
 
     user_code = task_result["user_code"]
     return_code = task_result["return_code"]
@@ -98,5 +98,12 @@ def reviewer(state: State) -> dict:
     progress["modules"][position["module_id"]][position["lesson_id"]][
         position["task_id"]
     ]["scores"].append(scores_dict)
+
+    progress["modules"][position["module_id"]][position["lesson_id"]][
+        position["task_id"]
+    ]["passed"] = (
+        all(verdict.passed for verdict in reviewer_llm_result.criteria)
+        and task_result["return_code"] == 0
+    )
 
     return {"review": reviewer_llm_result, "progress": progress}
