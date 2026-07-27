@@ -41,6 +41,17 @@ def find_current_task_info(curriculum: list, progress: dict) -> dict:
     return find_by_id(lesson["tasks"], current_task)
 
 
+def find_task_by_id(task_id: str, curriculum: list) -> dict:
+    for module in curriculum:
+        for lesson in module["lessons"]:
+            for task in lesson["tasks"]:
+                if task["id"] == task_id:
+                    return task
+    error_msg = f"Find_task_by_id: task_id {task_id} wasn't found in curriculum"
+    logger.critical(error_msg)
+    raise KeyError(error_msg)
+
+
 def task_status(task_id: str, progress: dict) -> bool:
 
     for module_id, lessons in progress["modules"].items():
@@ -56,3 +67,13 @@ def milestone_status(milestone_id: str, progress: dict, project_plan: dict) -> b
 
     milestone = find_by_id(project_plan["milestones"], milestone_id)
     return all(task_status(task_id, progress) for task_id in milestone["task_ids"])
+
+
+def milestone_tasks_info(milestone_id: str, progress: dict, project_plan: dict) -> list:
+
+    milestone = find_by_id(project_plan["milestones"], milestone_id)
+    milestone_tasks = [
+        {"task_id": task_id, "passed": task_status(task_id, progress)}
+        for task_id in milestone["task_ids"]
+    ]
+    return milestone_tasks

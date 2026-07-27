@@ -43,31 +43,38 @@ def test_runner(state: State) -> dict:
     attempts = progress["modules"][current_module][current_lesson][current_task][
         "attempts"
     ]
-    code = get_code_from_msg(user_msg)
+    user_code = get_code_from_msg(user_msg)
     stdout, stderr = "", ""
-    user_code = ""
+    test_code = ""
 
-    if not code:
+    if not user_code:
         logger.info(
             f"Test_runner: return_code = 8. There is no python code to execute in user_message: {user_msg}"
         )
         return_code = 8
     else:
         attempts += 1
-        user_code = code
+
+        if task["submission"] == "function":
+            test_code = user_code + "\n\n" + task["reference_test"]
+        elif task["submission"] == "test":
+            test_code = user_code
+        else:
+            logger.error(f"test_runner. Unknown task submission: {task['submission']}")
+            run_result = {"return_code": 4, "stdout": stdout, "stderr": stderr}
 
         if task["run_mode"] == "drill":
             with tempfile.TemporaryDirectory(
                 ignore_cleanup_errors=True, delete=True
             ) as temp_dir:
                 temp_dir_path = Path(temp_dir)
-                write_code_to_file(temp_dir_path, "test_user_task_code.py", user_code)
+                write_code_to_file(temp_dir_path, "test_user_task_code.py", test_code)
                 run_result = run_pytest(temp_dir_path, temp_dir_path)
 
         elif task["run_mode"] == "project":
             py_filename = f"test_{task['id']}.py".replace("-", "_")
             user_dir = Path(USER_DIR).resolve()
-            file_path = write_code_to_file(user_dir, py_filename, user_code)
+            file_path = write_code_to_file(user_dir, py_filename, test_code)
             run_result = run_pytest(user_dir, file_path)
             project_dir_run_result = run_pytest(user_dir, user_dir)
 
