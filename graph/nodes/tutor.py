@@ -20,16 +20,31 @@ def tutor_llm(state: State) -> dict:
 
     task_result = state.get("task_result")
     review = state.get("review")
+    milestone_result = state.get("milestone_result")
 
     context_parts = []
 
     if task_result:
+        project_dir_run = task_result["project_dir_run"]
         context_parts.append(
             f"Результат выполнения теста:\n"
             f" - Код возврата pytest: {task_result['return_code']}, {RETURN_CODES[task_result['return_code']]}\n"
             f" - Вывод: {task_result['stdout']}.\n"
             f" - Ошибки: {task_result['stderr']}"
         )
+
+        if (
+            task_result["return_code"] == 0
+            and project_dir_run
+            and project_dir_run["return_code"] != 0
+        ):
+            context_parts.append(
+                f"Обнаружена регрессия: присланный код прошёл, но один из ранее написанных "
+                f"тестов проекта перестал проходить. Результат прогона всего проекта:\n"
+                f" - Код возврата pytest: {project_dir_run['return_code']}, {RETURN_CODES[project_dir_run['return_code']]}\n"
+                f" - Вывод: {project_dir_run['stdout']}.\n"
+                f" - Ошибки: {project_dir_run['stderr']}"
+            )
 
     if review:
         criteria_review_str = "\n".join(
@@ -46,6 +61,13 @@ def tutor_llm(state: State) -> dict:
             f"Общие паттерны качества кода:\n{patterns_review_str}\n"
             f"Главная проблема кода студента:\n{review.main_problem}\n"
             f"Сильные стороны кода студента:\n{review.strengths}"
+        )
+
+    if milestone_result and milestone_result["return_code"] == 0:
+        context_parts.append(
+            f"Студент закрыл веху проекта: {milestone_result['goal']}. "
+            f"Это крупный рубеж — несколько связанных задач собрались в работающую часть проекта. "
+            f"Поздравь студента и отметь, какой этап проекта теперь готов."
         )
 
     context_str = "\n\n".join(context_parts)
