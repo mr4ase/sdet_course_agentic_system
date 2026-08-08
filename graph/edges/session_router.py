@@ -5,9 +5,10 @@ from typing import Literal
 from graph.state import State
 from loguru_config import logger
 from src.utils import find_current_task_info
+from config import FAILS_THRESHOLD
 
 
-def session_router(state: State) -> Literal["lead", "react", "test"]:
+def session_router(state: State) -> Literal["lead", "react", "test", "remediate"]:
 
     progress = state["progress"]
     curriculum = state["curriculum"]
@@ -18,6 +19,7 @@ def session_router(state: State) -> Literal["lead", "react", "test"]:
     task = find_current_task_info(curriculum, progress)
 
     task_given = progress["modules"][module_id][lesson_id][task_id]["task_given"]
+    task_fails = progress["modules"][module_id][lesson_id][task_id]["consecutive_fails"]
 
     logger.info(
         f"Session_router edge. Current position: module_id = {module_id}, lesson_id = {lesson_id}, task_id = {task_id}, task_given = {task_given}, task run_mode = {task['run_mode']}"
@@ -28,8 +30,10 @@ def session_router(state: State) -> Literal["lead", "react", "test"]:
 
     if not task_given:
         decision = "lead"
-    elif messages and python_code_identificator in str(messages[-1].content):
+    elif python_code_identificator in str(messages[-1].content):
         decision = "test"
+    elif task_fails >= FAILS_THRESHOLD:
+        decision = "remediate"
     else:
         decision = "react"
 

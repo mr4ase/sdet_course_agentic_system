@@ -9,6 +9,7 @@ USER_DIR = "student_workflow/"
 THE_USER = "John Doe"
 RUN_TEST_TIMEOUT = 5  # parameter for subprocess.run in seconds
 CRITERIA_PASSED_SCORE = 10
+FAILS_THRESHOLD = 2
 
 RETURN_CODES = {
     0: "passed",

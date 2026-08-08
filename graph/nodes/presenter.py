@@ -2,8 +2,6 @@
 
 import os
 
-from dotenv import load_dotenv
-
 from graph.state import State
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import SystemMessage, HumanMessage
@@ -15,13 +13,8 @@ from src.utils import (
     milestone_tasks_info,
     find_task_by_id,
 )
-from config import LLM_MODEL
 from system_prompts.presenter_prompt import presenter_role_system_message
-
-load_dotenv()
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-
-llm = ChatGoogleGenerativeAI(model=LLM_MODEL, google_api_key=GOOGLE_API_KEY)
+from src.llm import llm
 
 
 def presenter(state: State) -> dict:
@@ -67,7 +60,6 @@ def presenter(state: State) -> dict:
         context_parts.append(
             f"Текущая веха: {current_milestone['goal']}\n"
             f"Выполненные задания в вехе: {tasks_passed_str}\n"
-            f""
         )
 
     human_message_presenter = HumanMessage(content="Начни урок.")

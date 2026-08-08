@@ -1,23 +1,20 @@
 # nodes\reviewer.py
 
 import json
-import os
 
-from dotenv import load_dotenv
 from pathlib import Path
 from graph.state import State
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_core.messages import HumanMessage
 from typing import cast
 
-from config import LLM_MODEL
-from src.utils import find_by_id, get_score, find_lesson, find_current_task_info
-from system_prompts.reviewer_prompt import reviewer_role_system_message
 from config import RETURN_CODES
-from schema.reviewer_result import Verdict, ReviewerResult
+from src.utils import get_score, find_current_task_info
+from system_prompts.reviewer_prompt import reviewer_role_system_message
+from schema.reviewer_result import ReviewerResult
+from src.llm import llm
 
 
-from loguru import logger
+from loguru_config import logger
 
 
 def load_patterns(filename: str = "data/patterns.json") -> list:
@@ -40,11 +37,6 @@ def load_patterns(filename: str = "data/patterns.json") -> list:
 
 patterns = load_patterns()
 
-load_dotenv()
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-
-llm = ChatGoogleGenerativeAI(model=LLM_MODEL, google_api_key=GOOGLE_API_KEY)
-
 
 def reviewer(state: State) -> dict:
 
@@ -55,6 +47,10 @@ def reviewer(state: State) -> dict:
     assert task_result is not None, "test_result_router вызван без task_result"
 
     task = find_current_task_info(curriculum, progress)
+
+    task_progress = progress["modules"][position["module_id"]][position["lesson_id"]][
+        position["task_id"]
+    ]
 
     user_code = task_result["user_code"]
     return_code = task_result["return_code"]
@@ -95,15 +91,17 @@ def reviewer(state: State) -> dict:
 
     scores_dict = {"criteria": criteria_score, "patterns": patterns_score}
 
-    progress["modules"][position["module_id"]][position["lesson_id"]][
-        position["task_id"]
-    ]["scores"].append(scores_dict)
+    task_progress["scores"].append(scores_dict)
 
-    progress["modules"][position["module_id"]][position["lesson_id"]][
-        position["task_id"]
-    ]["passed"] = (
+    task_progress["passed"] = (
         all(verdict.passed for verdict in reviewer_llm_result.criteria)
         and task_result["return_code"] == 0
     )
+
+    if task_progress["passed"]:
+        task_progress["consecutive_fails"] = 0
+        task_progress["remediation_depth"] = 0
+    else:
+        task_progress["consecutive_fails"] = task_progress["consecutive_fails"] + 1
 
     return {"review": reviewer_llm_result, "progress": progress}

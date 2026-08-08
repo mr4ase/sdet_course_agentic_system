@@ -2,18 +2,13 @@
 
 import os
 
-from dotenv import load_dotenv
-
 from graph.state import State
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
-from config import LLM_MODEL, RETURN_CODES
+from langchain_core.messages import SystemMessage
+from config import RETURN_CODES
 from system_prompts.tutor_prompt import tutor_llm_role_system_message
+from src.llm import llm
 
-load_dotenv()
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-
-llm = ChatGoogleGenerativeAI(model=LLM_MODEL, google_api_key=GOOGLE_API_KEY)
+from loguru_config import logger
 
 
 def tutor_llm(state: State) -> dict:
@@ -32,6 +27,9 @@ def tutor_llm(state: State) -> dict:
             f" - Вывод: {task_result['stdout']}.\n"
             f" - Ошибки: {task_result['stderr']}"
         )
+        logger.debug(
+            f"task_result = {task_result}\n" f"Context_parts: \n{context_parts[-1]}\n"
+        )
 
         if (
             task_result["return_code"] == 0
@@ -44,6 +42,12 @@ def tutor_llm(state: State) -> dict:
                 f" - Код возврата pytest: {project_dir_run['return_code']}, {RETURN_CODES[project_dir_run['return_code']]}\n"
                 f" - Вывод: {project_dir_run['stdout']}.\n"
                 f" - Ошибки: {project_dir_run['stderr']}"
+            )
+            logger.debug(
+                f"task_result['return_code] = {task_result['return_code']}\n"
+                f"project_dir_run = {project_dir_run}\n"
+                f"project_dir_run['return_code'] = {project_dir_run['return_code']}\n"
+                f"Context_parts: \n{context_parts[-1]}\n"
             )
 
     if review:
@@ -62,6 +66,7 @@ def tutor_llm(state: State) -> dict:
             f"Главная проблема кода студента:\n{review.main_problem}\n"
             f"Сильные стороны кода студента:\n{review.strengths}"
         )
+        logger.debug(f"review = {review}\n" f"Context_parts: \n{context_parts[-1]}\n")
 
     if milestone_result and milestone_result["return_code"] == 0:
         context_parts.append(
@@ -69,8 +74,14 @@ def tutor_llm(state: State) -> dict:
             f"Это крупный рубеж — несколько связанных задач собрались в работающую часть проекта. "
             f"Поздравь студента и отметь, какой этап проекта теперь готов."
         )
+        logger.debug(
+            f"milestone_result = {milestone_result}\n"
+            f"milestone_result['return_code'] = {milestone_result['return_code']}\n"
+            f"Context_parts: \n{context_parts[-1]}\n"
+        )
 
     context_str = "\n\n".join(context_parts)
+    logger.info(f"Tutor msg context: {context_str}")
 
     msg_to_llm = [tutor_llm_role_system_message] + state["messages"]
     if context_str:
