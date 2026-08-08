@@ -63,6 +63,17 @@ def task_status(task_id: str, progress: dict) -> bool:
     raise KeyError(f"Task_id {task_id} not found in progress")
 
 
+def task_remediation_depth(task_id: str, progress: dict) -> int:
+
+    for module_id, lessons in progress["modules"].items():
+        for lesson_id, tasks in lessons.items():
+            if task_id in tasks:
+                return tasks[task_id]["remediation_depth"]
+
+    logger.error(f"Task_id {task_id} not found in progress")
+    raise KeyError(f"Task_id {task_id} not found in progress")
+
+
 def milestone_status(milestone_id: str, progress: dict, project_plan: dict) -> bool:
 
     milestone = find_by_id(project_plan["milestones"], milestone_id)
