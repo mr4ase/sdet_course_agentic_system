@@ -88,3 +88,57 @@ def milestone_tasks_info(milestone_id: str, progress: dict, project_plan: dict) 
         for task_id in milestone["task_ids"]
     ]
     return milestone_tasks
+
+
+def current_lesson_tasks_status(progress: dict) -> bool:
+
+    module_id = progress["current_position"]["module_id"]
+    lesson_id = progress["current_position"]["lesson_id"]
+
+    return all(
+        task["passed"] for task in progress["modules"][module_id][lesson_id].values()
+    )
+
+
+def find_index_by_id(items: list, target_id: str) -> int:
+
+    key = "id"
+
+    for i, item in enumerate(items):
+        if item[key] == target_id:
+            return i
+    error_msg = f"Find_index_by_id: {key} {target_id} wasn't found"
+    logger.critical(error_msg)
+    raise KeyError(error_msg)
+
+
+def next_position(curriculum: list, progress: dict) -> dict | None:
+    module_id = progress["current_position"]["module_id"]
+    lesson_id = progress["current_position"]["lesson_id"]
+    module = find_by_id(curriculum, module_id)
+    lessons = module["lessons"]
+    l_length = len(lessons)
+    m_length = len(curriculum)
+
+    i = find_index_by_id(lessons, lesson_id)
+    if i < l_length - 1:
+        next_module_id = module_id
+        next_lesson_id = lessons[i + 1]["id"]
+        next_task_id = lessons[i + 1]["tasks"][0]["id"]
+    else:
+        j = find_index_by_id(curriculum, module_id)
+        if j < m_length - 1:
+            next_module_id = curriculum[j + 1]["id"]
+            next_lesson_id = curriculum[j + 1]["lessons"][0]["id"]
+            next_task_id = curriculum[j + 1]["lessons"][0]["tasks"][0][
+                "id"
+            ]
+        else:
+            # TODO: обработать завершение курса — флаг course_completed, поздравление
+            return None
+
+    return {
+        "module_id": next_module_id,
+        "lesson_id": next_lesson_id,
+        "task_id": next_task_id,
+    }
