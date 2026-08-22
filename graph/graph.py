@@ -16,12 +16,14 @@ from graph.edges.session_router import session_router
 from graph.edges.test_result_router import test_result_router
 from graph.edges.milestone_router import milestone_router
 from graph.edges.remediation_classifier_router import remediation_classifier_router
+from graph.edges.advance_router import advance_router
 
 from graph.nodes.test_runner import test_runner
 from graph.nodes.presenter import presenter
 from graph.nodes.milestone_checker import milestone_checker
 from graph.nodes.remediator import remediator
 from graph.nodes.remediate_classifier import remediation_classifier
+from graph.nodes.advance_position import advance_position
 
 checkpointer = MemorySaver()
 
@@ -36,13 +38,13 @@ builder.add_node("system_error_handler", system_error_handler)
 builder.add_node("milestone_checker", milestone_checker)
 builder.add_node("remediator", remediator)
 builder.add_node("remediation_classifier", remediation_classifier)
+builder.add_node("advance_position", advance_position)
 
 # EDGES
 builder.add_edge(START, "progress_manager")
 # builder.add_edge("reviewer", "milestone_checker")
 builder.add_edge("milestone_checker", "tutor_llm")
 builder.add_edge("presenter", END)
-builder.add_edge("tutor_llm", END)
 builder.add_edge("system_error_handler", END)
 builder.add_edge("remediator", END)
 
@@ -80,4 +82,15 @@ builder.add_conditional_edges(
     {"needed": "remediator", "not_needed": "tutor_llm"},
 )
 
-graph = builder.compile(checkpointer=checkpointer)
+builder.add_conditional_edges(
+    "tutor_llm", advance_router, {"lesson_confirm": "advance_position", "finish": END}
+)
+
+graph = builder.compile(
+    interrupt_before=["advance_position"], checkpointer=checkpointer
+)
+
+png_bytes = graph.get_graph(xray=True).draw_mermaid_png()
+
+with open("img/graph.png", "wb") as f:
+    f.write(png_bytes)
