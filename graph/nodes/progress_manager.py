@@ -72,3 +72,5 @@ def progress_manager(state: State) -> dict:
 
     return update_dict
     # TODO: progress_manager перечитывает progress с диска на каждом новом проходе графа. Неэффективно. Переделать позже, когда мутации данных во время работы графа станут многочисленны и существенны (после ступени 9, например). Нужен будет один источник ответственности для данных progress в state - или MemorySaver или файл progress. Лучше - MemorySaver.
+
+    # TODO serialize/deserialize RunningSummary object
