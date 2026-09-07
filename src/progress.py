@@ -59,7 +59,6 @@ def init_progress(curriculum_dict: list, username: str) -> dict:
             "project_id": "",
             "progress": 0,
         },
-        "summary": "",
     }
 
     logger.debug(f"Progress init JSON prepared:  {progress_init_dict}")

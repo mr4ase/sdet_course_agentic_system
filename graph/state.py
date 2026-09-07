@@ -2,6 +2,7 @@
 
 from langgraph.graph import MessagesState
 from schema.reviewer_result import ReviewerResult
+from langmem.short_term import RunningSummary
 
 
 class State(MessagesState):
@@ -14,6 +15,7 @@ class State(MessagesState):
     project_plan: dict
     remediation_is_needed: bool
     remediation_depth: int
+    summary: RunningSummary|None
 
 # TODO (ступень 10): review: ReviewerResult в State сериализуется checkpointer'ом на паузе
 # и роняет warning "Deserializing unregistered type ... will be blocked in a future version".

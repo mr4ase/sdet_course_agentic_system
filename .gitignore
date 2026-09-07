@@ -5,3 +5,4 @@ __pycache__/
 student_workflow/
 data/project_state.json
 data/progress.json
+test_summary.py
