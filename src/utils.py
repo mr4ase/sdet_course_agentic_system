@@ -2,6 +2,8 @@
 
 from loguru_config import logger
 from schema.reviewer_result import Verdict
+from langchain_core.messages import AnyMessage
+from langmem.short_term.summarization import TokenCounter
 
 
 def find_by_id(items: list, target_id: str) -> dict:
@@ -130,9 +132,7 @@ def next_position(curriculum: list, progress: dict) -> dict | None:
         if j < m_length - 1:
             next_module_id = curriculum[j + 1]["id"]
             next_lesson_id = curriculum[j + 1]["lessons"][0]["id"]
-            next_task_id = curriculum[j + 1]["lessons"][0]["tasks"][0][
-                "id"
-            ]
+            next_task_id = curriculum[j + 1]["lessons"][0]["tasks"][0]["id"]
         else:
             # TODO: обработать завершение курса — флаг course_completed, поздравление
             return None

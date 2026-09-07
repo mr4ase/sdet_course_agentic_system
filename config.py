@@ -11,6 +11,14 @@ RUN_TEST_TIMEOUT = 5  # parameter for subprocess.run in seconds
 CRITERIA_PASSED_SCORE = 10
 FAILS_THRESHOLD = 2
 
+# summary parameters
+MAX_TOKEN_BEFORE_SUMMARY = 10000
+MAX_TOKENS = 4000
+MAX_SUMMARY_TOKENS = 2000
+
+MESSAGES_TO_KEEP_IN_HISTORY = 6
+
+
 RETURN_CODES = {
     0: "passed",
     1: "test_failed",

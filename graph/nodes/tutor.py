@@ -16,8 +16,17 @@ def tutor_llm(state: State) -> dict:
     task_result = state.get("task_result")
     review = state.get("review")
     milestone_result = state.get("milestone_result")
+    summary = state.get("summary")
 
     context_parts = []
+
+    if summary:
+        context_parts.append(
+            f"Саммари предыдущего общения со студентом:\n" f"{summary.summary}"
+        )
+        logger.debug(
+            f"summary = {summary.summary}\n" f"Context_parts: \n{context_parts[-1]}\n"
+        )
 
     if task_result:
         project_dir_run = task_result["project_dir_run"]
