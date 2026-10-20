@@ -11,11 +11,11 @@ def test_result_router(state: State) -> Literal["review", "answer", "system_erro
     assert task_result is not None, "test_result_router вызван без task_result"
     task_result_return_code = task_result["return_code"]
 
-    if task_result_return_code in [0, 1, 7]:
+    if task_result_return_code in [0, 1, 7, 10]:
         decision = "review"
     elif task_result_return_code in [2, 5, 8]:
         decision = "answer"
-    elif task_result_return_code in [3, 4, 6]:
+    elif task_result_return_code in [3, 4, 6, 9]:
         decision = "system_error"
     else:
         logger.warning(

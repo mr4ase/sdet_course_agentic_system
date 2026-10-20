@@ -94,7 +94,7 @@ def test_runner(state: State) -> dict:
         "project_dir_run": project_dir_run_result,
     }
 
-    if task_result["return_code"] in [3, 4, 6]:
+    if task_result["return_code"] in [3, 4, 6, 9]:
         logger.error(f"SYSTEM ERROR: Test_runner finished with an ERROR: {task_result}")
     else:
         logger.info(

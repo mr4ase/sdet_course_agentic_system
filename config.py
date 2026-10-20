@@ -5,6 +5,7 @@ PROGRESS_FILE_PATH = "data/progress.json"
 PROJECT_STATE_FILE_PATH = "data/project_state.json"
 PROJECT_PLAN_FILE_PATH = "data/project_plan.json"
 CURRICULUM_FILE_PATH = "data/curriculum.json"
+DOCKER_TEMP_DIR = "/sandbox"
 USER_DIR = "student_workflow/"
 THE_USER = "John Doe"
 RUN_TEST_TIMEOUT = 5  # parameter for subprocess.run in seconds
@@ -29,6 +30,8 @@ RETURN_CODES = {
     6: "max_warnings_exceeded",
     7: "timeout_expired",
     8: "no_code_in_message",
+    9: "docker_not_ available",
+    10: "docker_memory_is_exceeded",
 }
 
 SYSTEM_ERROR_MESSAGES = {
@@ -41,6 +44,9 @@ SYSTEM_ERROR_MESSAGES = {
     6: "Прогон теста был прерван системой из-за слишком большого числа предупреждений. "
     "Это внутреннее ограничение проверки, а не ошибка в твоём решении. "
     "Попробуй отправить код ещё раз.",
+    9: "Не удалось запустить среду проверки. "
+    "Это сбой на нашей стороне, не связанный с твоим кодом. "
+    "Попробуй ещё раз чуть позже.",
 }
 
 SYSTEM_ERROR_FALLBACK = (
