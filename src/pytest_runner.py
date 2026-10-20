@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 from loguru_config import logger
-from config import RUN_TEST_TIMEOUT
+from config import RUN_TEST_TIMEOUT, DOCKER_TEMP_DIR
 
 
 def write_code_to_file(dir_to: Path, filename: str, code: str) -> Path:
@@ -18,15 +18,25 @@ def write_code_to_file(dir_to: Path, filename: str, code: str) -> Path:
 
 
 def run_pytest(work_dir: Path, what_to_run: Path) -> dict:
+    relative = what_to_run.relative_to(work_dir)
+    target = f"{DOCKER_TEMP_DIR}/{relative.as_posix()}"
     try:
         result = subprocess.run(
             [
-                sys.executable,
-                "-m",
+                "docker",
+                "run",
+                "--rm",
+                "--network",
+                "none",
+                "--memory",
+                "256m",
+                "-v",
+                f"{work_dir.resolve()}:{DOCKER_TEMP_DIR}",
+                "sdet-runner",
                 "pytest",
-                str(what_to_run),
+                target,
                 "--rootdir",
-                str(work_dir),
+                f"{DOCKER_TEMP_DIR}",
                 "-p",
                 "no:cacheprovider",
             ],
@@ -43,7 +53,13 @@ def run_pytest(work_dir: Path, what_to_run: Path) -> dict:
             f"Test_runner. Return_code = 7. User's test task code exited with TimeoutExpired: {e}"
         )
         return_code = 7
-        stdout = e.stdout
-        stderr = e.stderr
+        stdout = e.stdout.decode() if isinstance(e.stdout, bytes) else (e.stdout or "")
+        stderr = e.stderr.decode() if isinstance(e.stderr, bytes) else (e.stderr or "")
+    except FileNotFoundError:
+        return_code, stdout, stderr = 9, "", "Команда docker не найдена. "
+    if return_code == 125:
+        return_code = 9
+    elif return_code == 137:
+        return_code = 10
 
     return {"return_code": return_code, "stdout": stdout, "stderr": stderr}
