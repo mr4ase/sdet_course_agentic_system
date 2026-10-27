@@ -8,7 +8,7 @@ CURRICULUM_FILE_PATH = "data/curriculum.json"
 DOCKER_TEMP_DIR = "/sandbox"
 USER_DIR = "student_workflow/"
 THE_USER = "John Doe"
-RUN_TEST_TIMEOUT = 5  # parameter for subprocess.run in seconds
+RUN_TEST_TIMEOUT = 15  # parameter for subprocess.run in seconds
 CRITERIA_PASSED_SCORE = 10
 FAILS_THRESHOLD = 2
 
@@ -54,3 +54,8 @@ SYSTEM_ERROR_FALLBACK = (
     "Это сбой на нашей стороне, не связанный с твоим кодом. "
     "Попробуй ещё раз чуть позже."
 )
+
+
+# TODO: task-000003 обращается к внешней сети (httpbin.org), а в песочнице
+# она отключена (--network none), задание в ней не пройдёт. Решение: второй
+# контейнер с локальным тестовым сервером во внутренней сети Docker.
