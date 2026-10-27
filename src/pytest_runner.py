@@ -1,7 +1,7 @@
 # src\pytest_runner.py
 
 import subprocess
-import sys
+import uuid
 
 from pathlib import Path
 
@@ -20,18 +20,21 @@ def write_code_to_file(dir_to: Path, filename: str, code: str) -> Path:
 def run_pytest(work_dir: Path, what_to_run: Path) -> dict:
     relative = what_to_run.relative_to(work_dir)
     target = f"{DOCKER_TEMP_DIR}/{relative.as_posix()}"
+    container_name = f"sandbox-{uuid.uuid4().hex[:8]}"
     try:
         result = subprocess.run(
             [
                 "docker",
                 "run",
                 "--rm",
+                "--name",
+                container_name,
                 "--network",
                 "none",
                 "--memory",
                 "256m",
                 "-v",
-                f"{work_dir.resolve()}:{DOCKER_TEMP_DIR}",
+                f"{work_dir.resolve()}:{DOCKER_TEMP_DIR}:ro",
                 "sdet-runner",
                 "pytest",
                 target,
@@ -43,12 +46,12 @@ def run_pytest(work_dir: Path, what_to_run: Path) -> dict:
             capture_output=True,
             text=True,
             timeout=RUN_TEST_TIMEOUT,
-            cwd=work_dir,
         )
         return_code = result.returncode
         stdout = result.stdout
         stderr = result.stderr
     except subprocess.TimeoutExpired as e:
+        subprocess.run(["docker", "rm", "-f", container_name], capture_output = True)
         logger.warning(
             f"Test_runner. Return_code = 7. User's test task code exited with TimeoutExpired: {e}"
         )
