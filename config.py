@@ -1,6 +1,13 @@
 # config.py
 
-LLM_MODEL = "gemini-2.5-flash"
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# LLM_MODEL = "gemini-2.5-flash"
+LLM_PROVIDER = "deepsek"
 PROGRESS_FILE_PATH = "data/progress.json"
 PROJECT_STATE_FILE_PATH = "data/project_state.json"
 PROJECT_PLAN_FILE_PATH = "data/project_plan.json"
@@ -18,6 +25,30 @@ MAX_TOKENS = 4000
 MAX_SUMMARY_TOKENS = 2000
 
 MESSAGES_TO_KEEP_IN_HISTORY = 6
+
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
+
+# llm model names and parameters
+LLM_MODEL = {
+    "deepseek": {
+        "model_name": "deepseek-flash",
+        "base_url": "https://api.deepseek.com",
+        "api_key": DEEPSEEK_API_KEY,
+        "client": "openai",
+    },
+    "gemini": {
+        "model_name": "gemini-2.5-flash",
+        "api_key": GOOGLE_API_KEY,
+        "client": "google",
+    },
+    "local_lm_studio": {
+        "model_name": "meta-llama-3.1-8b-instruct@q6_k",
+        "base_url": "http://localhost:1234/v1",
+        "api_key": "not-needed",
+        "client": "openai",
+    },
+}
 
 
 RETURN_CODES = {
