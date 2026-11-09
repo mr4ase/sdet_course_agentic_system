@@ -11,7 +11,7 @@ from config import RETURN_CODES
 from src.utils import get_score, find_current_task_info
 from system_prompts.reviewer_prompt import reviewer_role_system_message
 from schema.reviewer_result import ReviewerResult
-from src.llm import llm
+from src.llm import llm, llm_structured_output
 
 
 from loguru_config import logger
@@ -77,7 +77,7 @@ def reviewer(state: State) -> dict:
 - Вывод ошибок: {task_result['stderr']}
 """)
 
-    structured_llm = llm.with_structured_output(
+    structured_llm = llm_structured_output(
         ReviewerResult
     )  # include_raw = True flag adds the raw ai message
 

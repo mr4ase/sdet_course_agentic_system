@@ -9,13 +9,13 @@ from schema.remediation_classifier import RemediationClassifier
 from system_prompts.remediation_classifier_prompt import (
     remediation_classifier_role_system_message,
 )
-from src.llm import llm
+from src.llm import llm, llm_structured_output
 
 
 def remediation_classifier(state: State) -> dict:
 
     student_msg = str(state["messages"][-1].content)
-    structured_llm = llm.with_structured_output(RemediationClassifier)
+    structured_llm = llm_structured_output(RemediationClassifier)
     remediation_classifier_result = cast(
         RemediationClassifier,
         structured_llm.invoke(
