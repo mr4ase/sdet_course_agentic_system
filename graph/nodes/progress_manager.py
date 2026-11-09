@@ -16,6 +16,7 @@ from config import (
     MAX_TOKEN_BEFORE_SUMMARY,
     MAX_TOKENS,
     MESSAGES_TO_KEEP_IN_HISTORY,
+    USER_DIR,
 )
 from src.curriculum import load_curriculum
 from src.project_plan import load_project_plan
@@ -38,6 +39,8 @@ if not progress_file_path.exists():
 if not project_state_file_path.exists():
     project_state = init_project_state(project_plan)
     save_project_state(project_state)
+
+Path(USER_DIR).mkdir(parents=True, exist_ok=True)
 
 
 def progress_manager(state: State) -> dict:

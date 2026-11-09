@@ -11,7 +11,7 @@ It is built as a multi-step workflow with [LangGraph](https://github.com/langcha
 ## What it does
 
 1. **Presents a lesson.** Shows the key points of the topic and gives one practical task.
-2. **Runs the student's code.** Code sent in a ```` ```python ```` block is saved to a file and executed with pytest in a separate process with a time limit, so a broken or endless script cannot hang the system.
+2. **Runs the student's code.** Code sent in a ```` ```python ```` block is saved to a file and executed with pytest inside a Docker container with no network access, a memory limit and a time limit, so a broken, endless or malicious script cannot hang or harm the host.
 3. **Reviews the code.** An LLM checks the code against the task's criteria and four general quality patterns (meaningful names, no magic values, no duplication, readable structure) and returns a structured verdict with comments and a score from 0 to 10.
 4. **Tutors, does not solve.** The tutor explains what happened (test passed or failed, and why), points out the main problem and the strengths, and guides the student with questions.
 5. **Re-explains when the student is stuck.** If the student writes that they do not understand, or writes without code after failing a task twice in a row, the topic is explained again, simpler each time.
@@ -60,38 +60,66 @@ img/graph.png        Diagram of the workflow
 
 ## Tech stack
 
-Python · LangGraph · LangChain · LangMem · Pydantic · pytest · Loguru · Google Gemini (`gemini-2.5-flash`, via `langchain-google-genai`)
+Python · LangGraph · LangChain · LangMem · Pydantic · pytest · Docker · Loguru · DeepSeek (main model) · Google Gemini (fallback) · LM Studio (local model)
 
-The model is configured in one place (`src/llm.py` and `config.py`).
+The model is selected in one place: `LLM_PROVIDER` in `config.py`.
 
 ## Getting started
 
-You need Python 3.11+ and a Google AI (Gemini) API key.
+Requirements:
+
+- Linux, or Ubuntu in WSL 2 on Windows. On WSL, clone the repository into the Linux file system (for example `~/dev`), not into `/mnt/c`: files on the Windows drive are slow and break file permissions inside Docker containers.
+- Python 3.12+
+- Docker (on Windows: Docker Desktop with WSL integration enabled for your Ubuntu distribution)
+- An API key for DeepSeek or Google Gemini
 
 ```bash
 # 1. Create and activate a virtual environment
-python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
+#    (on Ubuntu, install the venv module first: sudo apt install python3-venv)
+python3 -m venv .venv
+source .venv/bin/activate
 
 # 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. Add your API key
-echo "GOOGLE_API_KEY=your-key-here" > .env
+# 3. Build the sandbox image used to run student code
+docker build -t sdet-runner .
 
-# 4. Create the folder where the student's project tests are stored
-mkdir student_workflow
+# 4. Add your API key(s) to .env
+echo "DEEPSEEK_API_KEY=your-key-here" >> .env
+echo "GOOGLE_API_KEY=your-key-here" >> .env
 
 # 5. Run the demo session
 python main.py
 ```
 
+### Choosing the model
+
+The model is selected by `LLM_PROVIDER` in `config.py`:
+
+| Value | Model | Needs |
+| --- | --- | --- |
+| `deepseek` (default) | `deepseek-flash` | `DEEPSEEK_API_KEY` |
+| `gemini` | `gemini-2.5-flash` | `GOOGLE_API_KEY` |
+| `local_lm_studio` | a local model in LM Studio | LM Studio server running on port 1234 |
+
+Model names, server addresses and provider-specific options live in the `LLM_MODEL` dictionary in `config.py`.
+
+To use LM Studio running on Windows from WSL, enable mirrored networking so that `localhost` is shared between Windows and Linux. Add to `%USERPROFILE%\.wslconfig`:
+
+```ini
+[wsl2]
+networkingMode=mirrored
+```
+
+then run `wsl --shutdown` in PowerShell and reopen Ubuntu.
+
 What to expect:
 
-- The first run shows the first lesson and task. Progress is saved to `data/progress.json`, so the next run continues from there.
+- The first run creates `data/progress.json`, `data/project_state.json` and the `student_workflow/` folder, then shows the first lesson and task. The next run continues from the saved progress.
 - `main.py` is a simple demo: it sends one hard-coded student message. To try the review flow, edit `test_msg_for_tutor` in `main.py` so that it contains a ```` ```python ```` block with your solution, then run it again.
 - After a lesson is completed, the console asks whether to move on (`да` / `нет`).
-- Progress files and the student folder are listed in `.gitignore` and are not committed.
+- Progress files and the student folder are listed in `.gitignore` and are not committed. To start the course over, delete `data/progress.json`, `data/project_state.json` and `student_workflow/`.
 
 ## Status and roadmap
 
@@ -99,6 +127,8 @@ Works now:
 
 - the full loop: lesson → code → pytest → review → feedback → next lesson
 - re-explanations with growing simplicity, regression detection across project tests, milestone checks, saved progress, conversation summaries
+- student code runs in an isolated Docker sandbox
+- the model is switchable in config: DeepSeek, Gemini or a local model in LM Studio
 - a small starter curriculum: 2 modules, 3 lessons, 5 tasks (pytest basics, fixtures, a first API status-code check)
 
 Known limitations and next steps:
