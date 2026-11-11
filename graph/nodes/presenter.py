@@ -8,7 +8,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from loguru_config import logger
 from src.utils import (
     find_by_id,
-    find_lesson,
+    find_current_lesson_info,
     find_current_task_info,
     milestone_tasks_info,
     find_task_by_id,
@@ -34,7 +34,7 @@ def presenter(state: State) -> dict:
     )
     context_parts = []
 
-    lesson = find_lesson(curriculum, progress)
+    lesson = find_current_lesson_info(curriculum, progress)
     task = find_current_task_info(curriculum, progress)
 
     current_milestone_id = project_state["current_milestone"]
@@ -46,12 +46,14 @@ def presenter(state: State) -> dict:
         find_task_by_id(task["task_id"], curriculum) for task in milestone_tasks_passed
     ]
 
-    # TODO: ступень 8 - не разворачивать key_points повторно, если в уроке уже есть task_given=true задание
+    # TODO: ступень 13 - не разворачивать key_points повторно, если в уроке уже есть task_given=true задание
 
     keypoints_str = "\n".join(f"- {kp}" for kp in lesson["key_points"])
 
     context_parts.append(f"Тезисы урока:\n" f"{keypoints_str}\n")
     context_parts.append(f"Практическое задание:\n" f"{task['task']}\n")
+    context_parts.append(f"Вид сдачи:\n" f"{task['submission']}\n")
+    context_parts.append(f"Режим запуска:\n" f"{task['run_mode']}\n")
 
     if task["run_mode"] == "project":
         tasks_passed_str = "\n".join(

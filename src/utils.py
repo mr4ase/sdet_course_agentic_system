@@ -29,7 +29,7 @@ def get_score(verdicts: list[Verdict]) -> int | None:
     return score
 
 
-def find_lesson(curriculum: list, progress: dict) -> dict:
+def find_current_lesson_info(curriculum: list, progress: dict) -> dict:
 
     current_module = progress["current_position"]["module_id"]
     current_lesson = progress["current_position"]["lesson_id"]
@@ -38,7 +38,7 @@ def find_lesson(curriculum: list, progress: dict) -> dict:
 
 
 def find_current_task_info(curriculum: list, progress: dict) -> dict:
-    lesson = find_lesson(curriculum, progress)
+    lesson = find_current_lesson_info(curriculum, progress)
     current_task = progress["current_position"]["task_id"]
     return find_by_id(lesson["tasks"], current_task)
 

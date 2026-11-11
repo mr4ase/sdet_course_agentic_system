@@ -8,7 +8,7 @@ from src.progress import save_progress
 from src.project_state import save_project_state
 from loguru_config import logger
 
-test_msg_for_tutor = HumanMessage(content="Начнем!")
+# test_msg_for_tutor = HumanMessage(content="Начнем!")
 
 # test_msg_for_tutor = HumanMessage(
 #     content="а, понял! вот так?\n```python\ndef test_addition():\n    assert 2 + 2 == 4\n```"
@@ -30,6 +30,10 @@ test_msg_for_tutor = HumanMessage(content="Начнем!")
 #     content="Я не понял тему. Объясни еще раз, пожалуйста"
 # )
 
+# test_msg_for_tutor = HumanMessage(content="В каком файле писать решение?")
+
+test_msg_for_tutor = HumanMessage(content="Напомни, что нужно сделать?")
+
 
 config: RunnableConfig = {"configurable": {"thread_id": "1"}}
 messages = graph.invoke({"messages": [test_msg_for_tutor]}, config=config)  # type: ignore[arg-type]
@@ -42,6 +46,7 @@ for m in messages["messages"]:
 # )
 
 snapshot = graph.get_state(config)
+logger.info(snapshot.values)
 if not snapshot.next:
     logger.info(f"END NODE IS NEXT")
 elif "advance_position" in snapshot.next:
