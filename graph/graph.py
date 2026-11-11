@@ -1,5 +1,9 @@
 # graph.py
 
+import sqlite3
+
+from langgraph.checkpoint.sqlite import SqliteSaver
+
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import StateGraph, START, END
 
@@ -25,7 +29,8 @@ from graph.nodes.remediator import remediator
 from graph.nodes.remediate_classifier import remediation_classifier
 from graph.nodes.advance_position import advance_position
 
-checkpointer = MemorySaver()
+conn = sqlite3.connect("data/checkpoints.db", check_same_thread=False)
+checkpointer = SqliteSaver(conn=conn)
 
 # NODES
 builder = StateGraph(State)
@@ -90,7 +95,8 @@ graph = builder.compile(
     interrupt_before=["advance_position"], checkpointer=checkpointer
 )
 
-png_bytes = graph.get_graph(xray=True).draw_mermaid_png()
+# Draw a mermaid graph structure in png format
+# png_bytes = graph.get_graph(xray=True).draw_mermaid_png()
 
-with open("img/graph.png", "wb") as f:
-    f.write(png_bytes)
+# with open("img/graph.png", "wb") as f:
+#     f.write(png_bytes)
