@@ -8,8 +8,6 @@ load_dotenv()
 
 # LLM_MODEL = "gemini-2.5-flash"
 LLM_PROVIDER = "deepseek"
-PROGRESS_FILE_PATH = "data/progress.json"
-PROJECT_STATE_FILE_PATH = "data/project_state.json"
 PROJECT_PLAN_FILE_PATH = "data/project_plan.json"
 CURRICULUM_FILE_PATH = "data/curriculum.json"
 DOCKER_TEMP_DIR = "/sandbox"
