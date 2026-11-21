@@ -9,7 +9,7 @@ class State(MessagesState):
     curriculum: list
     progress: dict
     task_result: dict | None
-    review: ReviewerResult | None
+    review: dict | None
     milestone_result: dict | None
     project_state: dict
     project_plan: dict

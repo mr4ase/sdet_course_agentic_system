@@ -74,19 +74,19 @@ def tutor_llm(state: State) -> dict:
 
     if review:
         criteria_review_str = "\n".join(
-            f" - {criteria_verdict.name}, результат: {'выполнено' if criteria_verdict.passed else 'не выполнено'}, комментарий: {criteria_verdict.comment}"
-            for criteria_verdict in review.criteria
+            f" - {criteria_verdict["name"]}, результат: {'выполнено' if criteria_verdict["passed"] else 'не выполнено'}, комментарий: {criteria_verdict["comment"]}"
+            for criteria_verdict in review["criteria"]
         )
         patterns_review_str = "\n".join(
-            f" - {pattern_verdict.name}, результат: {'выполнено' if pattern_verdict.passed else 'не выполнено'}, комментарий: {pattern_verdict.comment}"
-            for pattern_verdict in review.patterns
+            f" - {pattern_verdict["name"]}, результат: {'выполнено' if pattern_verdict["passed"] else 'не выполнено'}, комментарий: {pattern_verdict["comment"]}"
+            for pattern_verdict in review["patterns"]
         )
         context_parts.append(
             f"Результаты review кода студента:\n"
             f"Критерии для данной задачи:\n{criteria_review_str}\n"
             f"Общие паттерны качества кода:\n{patterns_review_str}\n"
-            f"Главная проблема кода студента:\n{review.main_problem}\n"
-            f"Сильные стороны кода студента:\n{review.strengths}"
+            f"Главная проблема кода студента:\n{review["main_problem"]}\n"
+            f"Сильные стороны кода студента:\n{review["strengths"]}"
         )
         logger.debug(f"review = {review}\n" f"Context_parts: \n{context_parts[-1]}\n")
 
