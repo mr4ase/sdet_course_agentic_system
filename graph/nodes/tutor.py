@@ -35,10 +35,10 @@ def tutor_llm(state: State) -> dict:
 
     if summary:
         context_parts.append(
-            f"Саммари предыдущего общения со студентом:\n" f"{summary.summary}"
+            f"Саммари предыдущего общения со студентом:\n" f"{summary["summary"]}"
         )
         logger.debug(
-            f"summary = {summary.summary}\n" f"Context_parts: \n{context_parts[-1]}\n"
+            f"summary = {summary["summary"]}\n" f"Context_parts: \n{context_parts[-1]}\n"
         )
 
     if task_result:

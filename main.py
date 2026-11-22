@@ -7,7 +7,7 @@ from graph.graph import graph
 from src.graph_helpers import resolve_pending
 from loguru_config import logger
 
-test_msg_for_tutor = HumanMessage(content="Привет!")
+test_msg_for_tutor = HumanMessage(content="Начнем!")
 
 # test_msg_for_tutor = HumanMessage(
 #     content="а, понял! вот так?\n```python\ndef test_addition():\n    assert 2 + 2 == 4\n```"
@@ -56,3 +56,4 @@ for m in messages:
 # Сейчас оставляем текстовое "да"/"нет"; свободные формулировки не понимаются.
 
 # print(graph.get_graph().draw_ascii())
+logger.debug(f"SUMMARY: {state.get('summary')}")
