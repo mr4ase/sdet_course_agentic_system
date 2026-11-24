@@ -4,7 +4,7 @@ import os
 
 from graph.state import State
 from langchain_core.messages import SystemMessage
-from config import RETURN_CODES
+from config import RETURN_CODES, SUBMISSION_DESCRIPTIONS, RUN_MODE_DESCRIPTIONS
 from system_prompts.tutor_prompt import tutor_llm_role_system_message
 from src.llm import llm
 from src.utils import find_current_task_info, find_current_lesson_info
@@ -20,7 +20,7 @@ def tutor_llm(state: State) -> dict:
     review = state.get("review")
     milestone_result = state.get("milestone_result")
     summary = state.get("summary")
-    current_task = find_current_task_info(curriculum=curriculum, progress=progress)
+    task = find_current_task_info(curriculum=curriculum, progress=progress)
     current_lesson = find_current_lesson_info(curriculum=curriculum, progress=progress)
 
     keypoints_str = "\n".join(f"- {kp}" for kp in current_lesson["key_points"])
@@ -30,15 +30,22 @@ def tutor_llm(state: State) -> dict:
     context_parts.append(f"Тезисы урока:\n" f"{keypoints_str}\n")
     logger.debug(f"Context_parts: тезисы урока: {keypoints_str}\n")
 
-    context_parts.append(f"Текущее задание:\n" f"{current_task["task"]}\n")
-    logger.debug(f"Context_parts: Текущее задание: {current_task["task"]}\n")
+    context_parts.append(f"Практическое задание:\n" f"{task['task']}\n")
+    context_parts.append(f"Вид сдачи:\n{SUBMISSION_DESCRIPTIONS[task['submission']]}\n")
+    context_parts.append(f"Режим запуска:\n{RUN_MODE_DESCRIPTIONS[task['run_mode']]}\n")
+    logger.debug(
+        f"Context_parts: Практическое задание: {task["task"]}\n"
+        f"Вид сдачи:\n{SUBMISSION_DESCRIPTIONS[task['submission']]}\n"
+        f"Режим запуска:\n{RUN_MODE_DESCRIPTIONS[task['run_mode']]}\n"
+    )
 
     if summary:
         context_parts.append(
             f"Саммари предыдущего общения со студентом:\n" f"{summary["summary"]}"
         )
         logger.debug(
-            f"summary = {summary["summary"]}\n" f"Context_parts: \n{context_parts[-1]}\n"
+            f"summary = {summary["summary"]}\n"
+            f"Context_parts: \n{context_parts[-1]}\n"
         )
 
     if task_result:

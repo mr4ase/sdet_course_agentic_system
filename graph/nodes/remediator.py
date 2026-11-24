@@ -9,6 +9,7 @@ from src.utils import (
     find_current_lesson_info,
     find_current_task_info,
 )
+from config import SUBMISSION_DESCRIPTIONS, RUN_MODE_DESCRIPTIONS
 
 from loguru_config import logger
 
@@ -21,7 +22,7 @@ def remediator(state: State) -> dict:
     task_progress = progress["modules"][current_position["module_id"]][
         current_position["lesson_id"]
     ][current_position["task_id"]]
-    current_task = find_current_task_info(curriculum=curriculum, progress=progress)
+    task = find_current_task_info(curriculum=curriculum, progress=progress)
     task_progress["remediation_depth"] += 1
 
     depth = task_progress["remediation_depth"]
@@ -33,8 +34,14 @@ def remediator(state: State) -> dict:
 
     keypoints_msg = f"Тезисы урока:\n" f"{keypoints_str}\n"
     context_parts.append(keypoints_msg)
-    context_parts.append(f"Текущее задание:\n" f"{current_task["task"]}\n")
-    logger.debug(f"Context_parts: Текущее задание: {current_task["task"]}\n")
+    context_parts.append(f"Практическое задание:\n" f"{task['task']}\n")
+    context_parts.append(f"Вид сдачи:\n{SUBMISSION_DESCRIPTIONS[task['submission']]}\n")
+    context_parts.append(f"Режим запуска:\n{RUN_MODE_DESCRIPTIONS[task['run_mode']]}\n")
+    logger.debug(
+        f"Context_parts: Практическое задание: {task["task"]}\n"
+        f"Вид сдачи:\n{SUBMISSION_DESCRIPTIONS[task['submission']]}\n"
+        f"Режим запуска:\n{RUN_MODE_DESCRIPTIONS[task['run_mode']]}\n"
+    )
 
     depth_msg = f"Уровень глубины:\n" f"{depth}\n"
     context_parts.append(depth_msg)

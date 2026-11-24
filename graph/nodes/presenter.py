@@ -1,9 +1,6 @@
 # nodes\presenter.py
 
-import os
-
 from graph.state import State
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import SystemMessage, HumanMessage
 from loguru_config import logger
 from src.utils import (
@@ -12,7 +9,9 @@ from src.utils import (
     find_current_task_info,
     milestone_tasks_info,
     find_task_by_id,
+    find_index_by_id,
 )
+from config import SUBMISSION_DESCRIPTIONS, RUN_MODE_DESCRIPTIONS
 from system_prompts.presenter_prompt import presenter_role_system_message
 from src.llm import llm
 
@@ -46,14 +45,18 @@ def presenter(state: State) -> dict:
         find_task_by_id(task["task_id"], curriculum) for task in milestone_tasks_passed
     ]
 
-    # TODO: ступень 13 - не разворачивать key_points повторно, если в уроке уже есть task_given=true задание
+    if find_index_by_id(lesson["tasks"], position["task_id"]) == 0:
+        keypoints_str = "\n".join(f"- {kp}" for kp in lesson["key_points"])
+        context_parts.append(f"Тезисы урока:\n" f"{keypoints_str}\n")
 
-    keypoints_str = "\n".join(f"- {kp}" for kp in lesson["key_points"])
-
-    context_parts.append(f"Тезисы урока:\n" f"{keypoints_str}\n")
     context_parts.append(f"Практическое задание:\n" f"{task['task']}\n")
-    context_parts.append(f"Вид сдачи:\n" f"{task['submission']}\n")
-    context_parts.append(f"Режим запуска:\n" f"{task['run_mode']}\n")
+    context_parts.append(f"Вид сдачи:\n{SUBMISSION_DESCRIPTIONS[task['submission']]}\n")
+    context_parts.append(f"Режим запуска:\n{RUN_MODE_DESCRIPTIONS[task['run_mode']]}\n")
+    logger.debug(
+        f"Context_parts: Практическое задание: {task["task"]}\n"
+        f"Вид сдачи:\n{SUBMISSION_DESCRIPTIONS[task['submission']]}\n"
+        f"Режим запуска:\n{RUN_MODE_DESCRIPTIONS[task['run_mode']]}\n"
+    )
 
     if task["run_mode"] == "project":
         tasks_passed_str = "\n".join(
@@ -64,7 +67,7 @@ def presenter(state: State) -> dict:
             f"Выполненные задания в вехе: {tasks_passed_str}\n"
         )
 
-    human_message_presenter = HumanMessage(content="Начни урок.")
+    human_message_presenter = HumanMessage(content="Выдай задание.")
 
     progress["modules"][position["module_id"]][position["lesson_id"]][
         position["task_id"]
