@@ -92,14 +92,14 @@ def milestone_tasks_info(milestone_id: str, progress: dict, project_plan: dict) 
     return milestone_tasks
 
 
-def current_lesson_tasks_status(progress: dict) -> bool:
+# def current_lesson_tasks_status(progress: dict) -> bool:
 
-    module_id = progress["current_position"]["module_id"]
-    lesson_id = progress["current_position"]["lesson_id"]
+#     module_id = progress["current_position"]["module_id"]
+#     lesson_id = progress["current_position"]["lesson_id"]
 
-    return all(
-        task["passed"] for task in progress["modules"][module_id][lesson_id].values()
-    )
+#     return all(
+#         task["passed"] for task in progress["modules"][module_id][lesson_id].values()
+#     )
 
 
 def find_index_by_id(items: list, target_id: str) -> int:
@@ -117,25 +117,36 @@ def find_index_by_id(items: list, target_id: str) -> int:
 def next_position(curriculum: list, progress: dict) -> dict | None:
     module_id = progress["current_position"]["module_id"]
     lesson_id = progress["current_position"]["lesson_id"]
+    task_id = progress["current_position"]["task_id"]
     module = find_by_id(curriculum, module_id)
     lessons = module["lessons"]
+    lesson = find_by_id(lessons, lesson_id)
+    tasks = lesson["tasks"]
     l_length = len(lessons)
     m_length = len(curriculum)
+    t_length = len(tasks)
 
-    i = find_index_by_id(lessons, lesson_id)
-    if i < l_length - 1:
+    t = find_index_by_id(tasks, task_id)
+
+    if t < t_length - 1:
         next_module_id = module_id
-        next_lesson_id = lessons[i + 1]["id"]
-        next_task_id = lessons[i + 1]["tasks"][0]["id"]
+        next_lesson_id = lesson_id
+        next_task_id = tasks[t + 1]["id"]
     else:
-        j = find_index_by_id(curriculum, module_id)
-        if j < m_length - 1:
-            next_module_id = curriculum[j + 1]["id"]
-            next_lesson_id = curriculum[j + 1]["lessons"][0]["id"]
-            next_task_id = curriculum[j + 1]["lessons"][0]["tasks"][0]["id"]
+        i = find_index_by_id(lessons, lesson_id)
+        if i < l_length - 1:
+            next_module_id = module_id
+            next_lesson_id = lessons[i + 1]["id"]
+            next_task_id = lessons[i + 1]["tasks"][0]["id"]
         else:
-            # TODO: обработать завершение курса — флаг course_completed, поздравление
-            return None
+            j = find_index_by_id(curriculum, module_id)
+            if j < m_length - 1:
+                next_module_id = curriculum[j + 1]["id"]
+                next_lesson_id = curriculum[j + 1]["lessons"][0]["id"]
+                next_task_id = curriculum[j + 1]["lessons"][0]["tasks"][0]["id"]
+            else:
+                # TODO: обработать завершение курса — флаг course_completed, поздравление
+                return None
 
     return {
         "module_id": next_module_id,

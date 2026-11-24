@@ -88,7 +88,7 @@ builder.add_conditional_edges(
 )
 
 builder.add_conditional_edges(
-    "tutor_llm", advance_router, {"lesson_confirm": "advance_position", "finish": END}
+    "tutor_llm", advance_router, {"advance_confirm": "advance_position", "finish": END}
 )
 
 graph = builder.compile(

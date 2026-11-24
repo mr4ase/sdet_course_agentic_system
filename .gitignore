@@ -5,3 +5,4 @@ __pycache__/
 student_workflow/
 data/checkpoints.db
 test_summary.py
+test_next_position.py
