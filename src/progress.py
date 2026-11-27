@@ -15,7 +15,6 @@ def init_progress(curriculum_dict: list, username: str) -> dict:
         "scores": [],
         "passed": False,
         "consecutive_fails": 0,
-        "remediation_depth": 0,
     }
 
     for module in curriculum_dict:

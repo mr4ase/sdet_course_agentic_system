@@ -7,11 +7,11 @@ from graph.graph import graph
 from src.graph_helpers import resolve_pending
 from loguru_config import logger
 
-test_msg_for_tutor = HumanMessage(content="Привет!")
+# test_msg_for_tutor = HumanMessage(content="Привет")
 
-# test_msg_for_tutor = HumanMessage(
-#     content="а, понял! вот так?\n```python\ndef test_addition():\n    assert 2 + 2 == 4\n```"
-# )
+test_msg_for_tutor = HumanMessage(
+    content="а, понял! вот так?\n```python\ndef test_addition():\n    assert 2 + 2 == 4\n```"
+)
 
 # test_msg_for_tutor = HumanMessage(
 #     content="а так?\n```python\ndef test_addition():\n    assert 2 + 2 == 5\n```"
@@ -39,12 +39,15 @@ config: RunnableConfig = {"configurable": {"thread_id": "1"}}
 # state = graph.get_state(config).values
 # progress = state["progress"]
 # progress["current_position"] = {
-#     "module_id": "001",
-#     "lesson_id": "000002",
-#     "task_id": "task-000002",
+#     "module_id": "002",
+#     "lesson_id": "000003",
+#     "task_id": "task-000003",
 # }
-# progress["modules"]["001"]["000001"]["task-000001"]["passed"] = True
-# progress["modules"]["001"]["000002"]["task-000002"]["task_given"] = True
+# for lessons in progress["modules"].values():
+#     for tasks in lessons.values():
+#         for task in tasks.values():
+#             task["task_given"] = True
+#             task["passed"] = True
 # graph.update_state(config, {"progress": progress})
 
 

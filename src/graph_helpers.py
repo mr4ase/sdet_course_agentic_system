@@ -50,8 +50,8 @@ def resolve_pending(graph: CompiledStateGraph, config: RunnableConfig) -> None:
                     else:
                         print("Нужно ответить только 'да' или 'нет'")
             else:
-                logger.warning(
-                    "Следующей позиции нет: курс пройден. Обработка конца курса ещё не сделана."
+                logger.error(
+                    "Пауза при отсутствии следующей позиции: ошибка маршрутизации."
                 )
                 graph.update_state(
                     config=config, values=None, as_node="advance_position"

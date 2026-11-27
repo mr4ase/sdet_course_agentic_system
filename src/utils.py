@@ -161,3 +161,12 @@ def current_milestone(project_plan: dict, project_state: dict) -> dict | None:
         if milestone["id"] not in project_state["closed_milestones"]:
             return milestone
     return None
+
+
+def course_completed(progress: dict) -> bool:
+    return all(
+        task["passed"]
+        for module in progress["modules"].values()
+        for lesson in module.values()
+        for task in lesson.values()
+    )

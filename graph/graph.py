@@ -28,6 +28,7 @@ from graph.nodes.milestone_checker import milestone_checker
 from graph.nodes.remediator import remediator
 from graph.nodes.remediate_classifier import remediation_classifier
 from graph.nodes.advance_position import advance_position
+from graph.nodes.course_finished import course_finished
 
 conn = sqlite3.connect("data/checkpoints.db", check_same_thread=False)
 checkpointer = SqliteSaver(conn=conn)
@@ -44,6 +45,7 @@ builder.add_node("milestone_checker", milestone_checker)
 builder.add_node("remediator", remediator)
 builder.add_node("remediation_classifier", remediation_classifier)
 builder.add_node("advance_position", advance_position)
+builder.add_node("course_finished", course_finished)
 
 # EDGES
 builder.add_edge(START, "progress_manager")
@@ -52,12 +54,14 @@ builder.add_edge("milestone_checker", "tutor_llm")
 builder.add_edge("presenter", END)
 builder.add_edge("system_error_handler", END)
 builder.add_edge("remediator", END)
+builder.add_edge("course_finished", END)
 
 # CONDITIONAL EDGES
 builder.add_conditional_edges(
     "progress_manager",
     session_router,
     {
+        "course_finished": "course_finished",
         "lead": "presenter",
         "react": "remediation_classifier",
         "test": "test_runner",
@@ -88,7 +92,13 @@ builder.add_conditional_edges(
 )
 
 builder.add_conditional_edges(
-    "tutor_llm", advance_router, {"advance_confirm": "advance_position", "finish": END}
+    "tutor_llm",
+    advance_router,
+    {
+        "course_finished": "course_finished",
+        "advance_confirm": "advance_position",
+        "finish": END,
+    },
 )
 
 graph = builder.compile(

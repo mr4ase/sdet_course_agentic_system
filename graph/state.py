@@ -12,7 +12,6 @@ class State(MessagesState):
     project_state: dict
     project_plan: dict
     remediation_is_needed: bool
-    remediation_depth: int
     summary: dict | None
 
 
