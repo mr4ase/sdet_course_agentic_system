@@ -1,0 +1,14 @@
+[
+  {
+    "id": "classifier-001",
+    "found": "2026-11-11, ступень 13, deepseek-flash",
+    "why": "Просьба назвать задание — не просьба объяснить тему заново, но классификатор их путает. Лишний вызов remediator увеличивает уровень глубины.",
+    "input": {
+      "student_message": "Напомни, что нужно сделать"
+    },
+    "expected": {
+      "remediation_is_needed": false
+    },
+    "observed": "remediation_is_needed = true"
+  }
+]
