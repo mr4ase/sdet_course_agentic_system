@@ -17,8 +17,8 @@ It is built as a multi-step workflow with [LangGraph](https://github.com/langcha
 5. **Re-explains when the student is stuck.** If the student writes that they do not understand, or writes without code after failing a task twice in a row, the topic is explained again, simpler each time.
 6. **Tracks a growing project.** Some tasks build one test project step by step. Every new submission also re-runs all earlier tests, so the tutor can say "your new code is fine, but it broke a test you wrote before."
 7. **Checks milestones.** When all tasks of a project milestone are passed, the system runs a milestone check and the tutor celebrates the achievement.
-8. **Waits for confirmation.** When a lesson is finished, the workflow pauses and asks the student before moving on.
-
+8. **Waits for confirmation.** When a task is passed, the workflow pauses and asks the student before moving to the next task or lesson.
+9. **Finishes the course.** When every task is passed, the student gets a final message instead of new tasks.
 ## How it works
 
 ![Workflow graph](img/graph.png)
@@ -116,10 +116,10 @@ then run `wsl --shutdown` in PowerShell and reopen Ubuntu.
 
 What to expect:
 
-- The first run creates `data/progress.json`, `data/project_state.json` and the `student_workflow/` folder, then shows the first lesson and task. The next run continues from the saved progress.
+- The first run creates `data/checkpoints.db` and the `student_workflow/` folder, then shows the first lesson and task. The next run continues from the saved state.
 - `main.py` is a simple demo: it sends one hard-coded student message. To try the review flow, edit `test_msg_for_tutor` in `main.py` so that it contains a ```` ```python ```` block with your solution, then run it again.
-- After a lesson is completed, the console asks whether to move on (`да` / `нет`).
-- Progress files and the student folder are listed in `.gitignore` and are not committed. To start the course over, delete `data/progress.json`, `data/project_state.json` and `student_workflow/`.
+- After a task is passed, the console asks whether to move on (`да` / `нет`). If the program was closed at this question, it asks again on the next start.
+- The database and the student folder are listed in `.gitignore` and are not committed. To start the course over, delete `data/checkpoints.db` and `student_workflow/`.
 
 ## Status and roadmap
 
@@ -130,12 +130,12 @@ Works now:
 - student code runs in an isolated Docker sandbox
 - the model is switchable in config: DeepSeek, Gemini or a local model in LM Studio
 - a small starter curriculum: 2 modules, 3 lessons, 5 tasks (pytest basics, fixtures, a first API status-code check)
+- the whole workflow state, including progress and conversation summaries, is saved in SQLite and survives restarts
+- tasks within a lesson and lessons advance with the student's confirmation; project milestones advance automatically; course completion is detected
 
 Known limitations and next steps:
 
 - no chat interface yet, only the console demo
 - the course content is small, and the milestone checks are placeholders
-- the "continue to the next lesson?" answer only understands exact `да` / `нет`; an LLM-based intent check is planned
-- course completion is not handled yet
-- the workflow state is kept in memory only (`MemorySaver`); the student's progress itself is stored in JSON files
+- the "continue to the next lesson?" answer only understands exact `да` / `нет`
 - the project has no automated tests of its own yet

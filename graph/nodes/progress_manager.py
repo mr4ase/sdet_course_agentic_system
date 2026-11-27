@@ -5,13 +5,12 @@ from pathlib import Path
 from langmem.short_term import summarize_messages
 from langmem.short_term.summarization import count_tokens_approximately
 from langchain.messages import RemoveMessage
+from langmem.short_term import RunningSummary
 
 from graph.state import State
 
 from config import (
-    PROGRESS_FILE_PATH,
     THE_USER,
-    PROJECT_STATE_FILE_PATH,
     MAX_SUMMARY_TOKENS,
     MAX_TOKEN_BEFORE_SUMMARY,
     MAX_TOKENS,
@@ -20,34 +19,51 @@ from config import (
 )
 from src.curriculum import load_curriculum
 from src.project_plan import load_project_plan
-from src.progress import load_progress, save_progress, init_progress
-from src.project_state import load_project_state, init_project_state, save_project_state
+from src.progress import init_progress
+from src.project_state import init_project_state
 from src.llm import llm
 
 from loguru_config import logger
 
-progress_file_path = Path(PROGRESS_FILE_PATH)
-project_state_file_path = Path(PROJECT_STATE_FILE_PATH)
 curriculum = load_curriculum()
 project_plan = load_project_plan()
 the_user = THE_USER
-
-if not progress_file_path.exists():
-    progress = init_progress(curriculum, the_user)
-    save_progress(progress)
-
-if not project_state_file_path.exists():
-    project_state = init_project_state(project_plan)
-    save_project_state(project_state)
 
 Path(USER_DIR).mkdir(parents=True, exist_ok=True)
 
 
 def progress_manager(state: State) -> dict:
 
+    progress = state.get("progress")
+    if progress is None:
+        logger.info("Progress пуст. Создаем его с нуля.")
+        progress = init_progress(curriculum, the_user)
+
+    project_state = state.get("project_state")
+    if project_state is None:
+        logger.info("Project_state пуст. Создаем его с нуля.")
+        project_state = init_project_state()
+
+    to_summarize = state["messages"][:-MESSAGES_TO_KEEP_IN_HISTORY]
+    logger.debug(
+        f"Для сворачивания: сообщений {len(to_summarize)}, "
+        f"токенов {count_tokens_approximately(to_summarize)}"
+    )
+
+    summary = state.get("summary")
+
+    if summary is None:
+        last_summary = None
+    else:
+        last_summary = RunningSummary(
+            summary=summary["summary"],
+            summarized_message_ids=set(summary["summarized_message_ids"]),
+            last_summarized_message_id=summary["last_summarized_message_id"],
+        )
+
     summary_result = summarize_messages(
-        state["messages"][:-MESSAGES_TO_KEEP_IN_HISTORY],
-        running_summary=state.get("summary"),
+        to_summarize,
+        running_summary=last_summary,
         token_counter=count_tokens_approximately,
         model=llm,
         max_tokens=MAX_TOKENS,
@@ -56,24 +72,28 @@ def progress_manager(state: State) -> dict:
     )
 
     update_dict = {
-        # "messages": state_messages,
         "curriculum": curriculum,
-        "progress": load_progress(),
+        "progress": progress,
         "task_result": None,
         "review": None,
         "milestone_result": None,
-        "project_state": load_project_state(),
+        "project_state": project_state,
         "project_plan": project_plan,
         "remediation_is_needed": False,
-        # "summary": messages_summary,
     }
 
-    if summary_result.running_summary is not None:
-        msg_ids_to_remove = summary_result.running_summary.summarized_message_ids
+    new_summary = summary_result.running_summary
+
+    if new_summary is not None:
+        already_removed = set()
+        if last_summary is not None:
+            already_removed = last_summary.summarized_message_ids
+        msg_ids_to_remove = new_summary.summarized_message_ids - already_removed
         update_dict["messages"] = [RemoveMessage(id=id) for id in msg_ids_to_remove]
-        update_dict["summary"] = summary_result.running_summary
+        update_dict["summary"] = {
+            "summary": new_summary.summary,
+            "summarized_message_ids": list(new_summary.summarized_message_ids),
+            "last_summarized_message_id": new_summary.last_summarized_message_id,
+        }
 
     return update_dict
-    # TODO: progress_manager перечитывает progress с диска на каждом новом проходе графа. Неэффективно. Переделать позже, когда мутации данных во время работы графа станут многочисленны и существенны (после ступени 9, например). Нужен будет один источник ответственности для данных progress в state - или MemorySaver или файл progress. Лучше - MemorySaver.
-
-    # TODO serialize/deserialize RunningSummary object

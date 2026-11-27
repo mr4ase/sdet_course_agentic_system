@@ -3,6 +3,7 @@
 __pycache__/
 *.pyc
 student_workflow/
-data/project_state.json
-data/progress.json
+data/checkpoints.db
 test_summary.py
+test_next_position.py
+test_current_milestone.py

@@ -104,4 +104,4 @@ def reviewer(state: State) -> dict:
     else:
         task_progress["consecutive_fails"] = task_progress["consecutive_fails"] + 1
 
-    return {"review": reviewer_llm_result, "progress": progress}
+    return {"review": reviewer_llm_result.model_dump(), "progress": progress}

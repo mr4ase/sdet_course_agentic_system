@@ -4,28 +4,48 @@ import os
 
 from graph.state import State
 from langchain_core.messages import SystemMessage
-from config import RETURN_CODES
+from config import RETURN_CODES, SUBMISSION_DESCRIPTIONS, RUN_MODE_DESCRIPTIONS
 from system_prompts.tutor_prompt import tutor_llm_role_system_message
 from src.llm import llm
+from src.utils import find_current_task_info, find_current_lesson_info
 
 from loguru_config import logger
 
 
 def tutor_llm(state: State) -> dict:
 
+    curriculum = state["curriculum"]
+    progress = state["progress"]
     task_result = state.get("task_result")
     review = state.get("review")
     milestone_result = state.get("milestone_result")
     summary = state.get("summary")
+    task = find_current_task_info(curriculum=curriculum, progress=progress)
+    current_lesson = find_current_lesson_info(curriculum=curriculum, progress=progress)
+
+    keypoints_str = "\n".join(f"- {kp}" for kp in current_lesson["key_points"])
 
     context_parts = []
 
+    context_parts.append(f"Тезисы урока:\n" f"{keypoints_str}\n")
+    logger.debug(f"Context_parts: тезисы урока: {keypoints_str}\n")
+
+    context_parts.append(f"Практическое задание:\n" f"{task['task']}\n")
+    context_parts.append(f"Вид сдачи:\n{SUBMISSION_DESCRIPTIONS[task['submission']]}\n")
+    context_parts.append(f"Режим запуска:\n{RUN_MODE_DESCRIPTIONS[task['run_mode']]}\n")
+    logger.debug(
+        f"Context_parts: Практическое задание: {task["task"]}\n"
+        f"Вид сдачи:\n{SUBMISSION_DESCRIPTIONS[task['submission']]}\n"
+        f"Режим запуска:\n{RUN_MODE_DESCRIPTIONS[task['run_mode']]}\n"
+    )
+
     if summary:
         context_parts.append(
-            f"Саммари предыдущего общения со студентом:\n" f"{summary.summary}"
+            f"Саммари предыдущего общения со студентом:\n" f"{summary["summary"]}"
         )
         logger.debug(
-            f"summary = {summary.summary}\n" f"Context_parts: \n{context_parts[-1]}\n"
+            f"summary = {summary["summary"]}\n"
+            f"Context_parts: \n{context_parts[-1]}\n"
         )
 
     if task_result:
@@ -61,19 +81,19 @@ def tutor_llm(state: State) -> dict:
 
     if review:
         criteria_review_str = "\n".join(
-            f" - {criteria_verdict.name}, результат: {'выполнено' if criteria_verdict.passed else 'не выполнено'}, комментарий: {criteria_verdict.comment}"
-            for criteria_verdict in review.criteria
+            f" - {criteria_verdict["name"]}, результат: {'выполнено' if criteria_verdict["passed"] else 'не выполнено'}, комментарий: {criteria_verdict["comment"]}"
+            for criteria_verdict in review["criteria"]
         )
         patterns_review_str = "\n".join(
-            f" - {pattern_verdict.name}, результат: {'выполнено' if pattern_verdict.passed else 'не выполнено'}, комментарий: {pattern_verdict.comment}"
-            for pattern_verdict in review.patterns
+            f" - {pattern_verdict["name"]}, результат: {'выполнено' if pattern_verdict["passed"] else 'не выполнено'}, комментарий: {pattern_verdict["comment"]}"
+            for pattern_verdict in review["patterns"]
         )
         context_parts.append(
             f"Результаты review кода студента:\n"
             f"Критерии для данной задачи:\n{criteria_review_str}\n"
             f"Общие паттерны качества кода:\n{patterns_review_str}\n"
-            f"Главная проблема кода студента:\n{review.main_problem}\n"
-            f"Сильные стороны кода студента:\n{review.strengths}"
+            f"Главная проблема кода студента:\n{review["main_problem"]}\n"
+            f"Сильные стороны кода студента:\n{review["strengths"]}"
         )
         logger.debug(f"review = {review}\n" f"Context_parts: \n{context_parts[-1]}\n")
 
@@ -90,7 +110,7 @@ def tutor_llm(state: State) -> dict:
         )
 
     context_str = "\n\n".join(context_parts)
-    logger.info(f"Tutor msg context: {context_str}")
+    logger.debug(f"Tutor msg context: {context_str}")
 
     msg_to_llm = [tutor_llm_role_system_message] + state["messages"]
     if context_str:

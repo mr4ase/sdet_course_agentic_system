@@ -8,8 +8,6 @@ load_dotenv()
 
 # LLM_MODEL = "gemini-2.5-flash"
 LLM_PROVIDER = "deepseek"
-PROGRESS_FILE_PATH = "data/progress.json"
-PROJECT_STATE_FILE_PATH = "data/project_state.json"
 PROJECT_PLAN_FILE_PATH = "data/project_plan.json"
 CURRICULUM_FILE_PATH = "data/curriculum.json"
 DOCKER_TEMP_DIR = "/sandbox"
@@ -89,6 +87,21 @@ SYSTEM_ERROR_FALLBACK = (
     "Это сбой на нашей стороне, не связанный с твоим кодом. "
     "Попробуй ещё раз чуть позже."
 )
+
+SUBMISSION_DESCRIPTIONS = {
+    "test": "студент присылает тест; запускаются тесты, которые он написал",
+    "function": "студент присылает только функцию, без тестов; её проверяют эталонные тесты системы",
+}
+RUN_MODE_DESCRIPTIONS = {
+    "project": "код становится частью проекта ученика; вместе с ним запускаются все его прежние тесты",
+    "drill": "код проверяется отдельно от проекта; прежние тесты ученика не запускаются",
+}
+
+COURSE_COMPLETED_MESSAGE = (
+    "Поздравляем: вы прошли курс целиком и выполнили все задания! "
+)
+
+PYTHON_CODE_IDENTIFICATOR = "```python"
 
 
 # TODO: task-000003 обращается к внешней сети (httpbin.org), а в песочнице
