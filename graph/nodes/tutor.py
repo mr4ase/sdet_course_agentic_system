@@ -110,7 +110,7 @@ def tutor_llm(state: State) -> dict:
         )
 
     context_str = "\n\n".join(context_parts)
-    logger.info(f"Tutor msg context: {context_str}")
+    logger.debug(f"Tutor msg context: {context_str}")
 
     msg_to_llm = [tutor_llm_role_system_message] + state["messages"]
     if context_str:

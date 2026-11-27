@@ -38,19 +38,13 @@ config: RunnableConfig = {"configurable": {"thread_id": "1"}}
 
 # state = graph.get_state(config).values
 # progress = state["progress"]
-# lesson = progress["modules"]["001"]["000001"]
-# lesson["task-000006"]["passed"] = True
-# lesson["task-000007"]["passed"] = True
-# graph.update_state(config, {"progress": progress})
-
-# state = graph.get_state(config).values
-# progress = state["progress"]
 # progress["current_position"] = {
 #     "module_id": "001",
-#     "lesson_id": "000001",
-#     "task_id": "task-000007",
+#     "lesson_id": "000002",
+#     "task_id": "task-000002",
 # }
-# progress["modules"]["001"]["000001"]["task-000007"]["task_given"] = True
+# progress["modules"]["001"]["000001"]["task-000001"]["passed"] = True
+# progress["modules"]["001"]["000002"]["task-000002"]["task_given"] = True
 # graph.update_state(config, {"progress": progress})
 
 

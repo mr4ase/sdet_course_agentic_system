@@ -42,7 +42,7 @@ def progress_manager(state: State) -> dict:
     project_state = state.get("project_state")
     if project_state is None:
         logger.info("Project_state пуст. Создаем его с нуля.")
-        project_state = init_project_state(project_plan)
+        project_state = init_project_state()
 
     to_summarize = state["messages"][:-MESSAGES_TO_KEEP_IN_HISTORY]
     logger.debug(

@@ -10,6 +10,7 @@ from src.utils import (
     milestone_tasks_info,
     find_task_by_id,
     find_index_by_id,
+    current_milestone,
 )
 from config import SUBMISSION_DESCRIPTIONS, RUN_MODE_DESCRIPTIONS
 from system_prompts.presenter_prompt import presenter_role_system_message
@@ -36,15 +37,6 @@ def presenter(state: State) -> dict:
     lesson = find_current_lesson_info(curriculum, progress)
     task = find_current_task_info(curriculum, progress)
 
-    current_milestone_id = project_state["current_milestone"]
-    current_milestone = find_by_id(project_plan["milestones"], current_milestone_id)
-    milestone_tasks = milestone_tasks_info(current_milestone_id, progress, project_plan)
-    milestone_tasks_passed = [task for task in milestone_tasks if task["passed"]]
-
-    passed_tasks = [
-        find_task_by_id(task["task_id"], curriculum) for task in milestone_tasks_passed
-    ]
-
     if find_index_by_id(lesson["tasks"], position["task_id"]) == 0:
         keypoints_str = "\n".join(f"- {kp}" for kp in lesson["key_points"])
         context_parts.append(f"Тезисы урока:\n" f"{keypoints_str}\n")
@@ -58,12 +50,22 @@ def presenter(state: State) -> dict:
         f"Режим запуска:\n{RUN_MODE_DESCRIPTIONS[task['run_mode']]}\n"
     )
 
-    if task["run_mode"] == "project":
+    milestone = current_milestone(
+        project_plan=project_plan, project_state=project_state
+    )
+    if task["run_mode"] == "project" and milestone is not None:
+        milestone_tasks = milestone_tasks_info(milestone["id"], progress, project_plan)
+        passed_tasks = [
+            find_task_by_id(task["task_id"], curriculum)
+            for task in milestone_tasks
+            if task["passed"]
+        ]
+
         tasks_passed_str = "\n".join(
             passed_task["task"] for passed_task in passed_tasks
         )
         context_parts.append(
-            f"Текущая веха: {current_milestone['goal']}\n"
+            f"Текущая веха: {milestone['goal']}\n"
             f"Выполненные задания в вехе: {tasks_passed_str}\n"
         )
 

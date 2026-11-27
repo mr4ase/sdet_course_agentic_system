@@ -4,10 +4,10 @@ import json
 from loguru_config import logger
 from pathlib import Path
 
-def init_project_state(project_dict: dict) -> dict:
+
+def init_project_state() -> dict:
 
     projest_state_init_dict = {
-        "current_milestone": project_dict["milestones"][0]["id"],
         "closed_milestones": [],
     }
 

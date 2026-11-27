@@ -153,3 +153,11 @@ def next_position(curriculum: list, progress: dict) -> dict | None:
         "lesson_id": next_lesson_id,
         "task_id": next_task_id,
     }
+
+
+def current_milestone(project_plan: dict, project_state: dict) -> dict | None:
+
+    for milestone in project_plan["milestones"]:
+        if milestone["id"] not in project_state["closed_milestones"]:
+            return milestone
+    return None
